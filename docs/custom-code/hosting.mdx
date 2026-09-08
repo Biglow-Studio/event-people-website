@@ -36,6 +36,10 @@ For most day-to-day content edits, uploading directly through Webflow's native a
 
 Once the files are hosted and you have a stable HTTPS URL for each:
 
+<Note>
+  `about.js` is intentionally excluded below. The About page's current bio/text layout is permanent, so this file is deprecated and should not be wired in — see [Custom Code Overview](/custom-code/overview).
+</Note>
+
 <Steps>
   <Step title="Load GSAP + plugins first">
     On every page that uses any custom code — in practice, that's every page because of `global.js`. Add the GSAP script tags in **Project Settings → Custom Code → Footer Code** (site-wide), *above* where `global.js` will be referenced.
@@ -45,13 +49,6 @@ Once the files are hosted and you have a stable HTTPS URL for each:
   </Step>
   <Step title="home.js → Home page">
     **Home page → Page Settings → Custom Code → Before `</body>`**.
-  </Step>
-  <Step title="about.js → About page">
-    **About page → Page Settings → Custom Code → Before `</body>`**.
-
-    <Warning>
-      As of the last site check (see [Custom Code Overview](/custom-code/overview)), the About page no longer has any of the sections this file targets — wiring it in today would load dead code with nothing to animate. Confirm the page layout before doing this.
-    </Warning>
   </Step>
   <Step title="how-we-work.js → two pages">
     Applied on **both** the **Destinations** page **and** **The Collective** page → Page Settings → Custom Code → Before `</body>` on each.
