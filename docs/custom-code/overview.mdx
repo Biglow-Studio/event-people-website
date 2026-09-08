@@ -3,7 +3,7 @@ title: Custom Code Overview
 description: What the four project JS files do, their dependencies, and current status.
 ---
 
-Custom code here is JavaScript layered on top of Webflow's standard build — almost entirely GSAP-driven scroll and interaction animation (sliders, pinned sections, split-text reveals, a draggable "tornado" card stack, etc.), plus one smooth-scroll library.
+Custom code here is JavaScript layered on top of Webflow's standard build — almost entirely GSAP-driven scroll and interaction animation (sliders, pinned sections, split-text reveals, etc.), plus one smooth-scroll library.
 
 <Warning>
   **Current state as of this handoff:** the project's custom-code files live in this repo but are **not yet wired into Webflow** — no scripts are currently registered or applied at the site or page level. The only custom code already live on the site is the Lenis smooth-scroll snippet described below. See [Hosting the Custom Code](/custom-code/hosting) to wire them in.
@@ -11,12 +11,16 @@ Custom code here is JavaScript layered on top of Webflow's standard build — al
 
 ## The four project files
 
+<Info>
+  **Verified against the live staging site** (`event-people-reworked.webflow.io`) on 2026-09-08. Webflow structure can drift from the code without warning — re-check before wiring anything in if it's been a while.
+</Info>
+
 | File | Scope | What it drives |
 |---|---|---|
-| [`global.js`](https://github.com/tamyankevich/EP-rework/blob/main/global.js) | **Site-wide** | Nav menu open/close animation and content stagger; hides the nav bar once the footer scrolls into view. Runs on every page. |
-| [`home.js`](https://github.com/tamyankevich/EP-rework/blob/main/home.js) | **Home** page only | Cascading image slider, 3D draggable card "tornado" (uses GSAP Observer), sticky steps indicator, hero video object-position handling, a hover sound effect (currently commented out/disabled in the code). |
-| [`about.js`](https://github.com/tamyankevich/EP-rework/blob/main/about.js) | **About** page only | Pinning the visuals column against the timeline on mobile, the scroll-driven step-by-step timeline, and the interactive image collage hover/focus effect. |
-| [`how-we-work.js`](https://github.com/tamyankevich/EP-rework/blob/main/how-we-work.js) | **Destinations** + **The Collective** pages | Despite the filename (a holdover from an earlier page structure), this file now drives: the sticky-video scroll-reveal service cards on Destinations, and the spatial member-card slider + bio "read more" toggle on The Collective. A third feature that used to live here — a radial cards slider — was removed from the live site and has been cleaned out of the code. |
+| [`global.js`](https://github.com/tamyankevich/EP-rework/blob/main/global.js) | **Site-wide** | Nav menu open/close animation and content stagger; hides the nav bar once the footer scrolls into view. Runs on every page. Confirmed live on all pages. |
+| [`home.js`](https://github.com/tamyankevich/EP-rework/blob/main/home.js) | **Home** page only | Cascading image slider, sticky steps indicator, hero video object-position handling, a hover sound effect (currently commented out/disabled in the code). The file also contains a 3D draggable card "tornado" (built on GSAP Observer) — **that section no longer exists on the live Home page**; only orphaned CSS referencing it remains, so this part of the file is currently inert. |
+| [`about.js`](https://github.com/tamyankevich/EP-rework/blob/main/about.js) | **About** page only | Pins a visuals column against a step timeline on mobile, drives a scroll-triggered step-by-step timeline, and an interactive image collage hover/focus effect. **None of these sections currently exist on the live About page** — the page today is a plain bio/text layout with no matching markup. This entire file is inert unless/until that layout comes back. |
+| [`how-we-work.js`](https://github.com/tamyankevich/EP-rework/blob/main/how-we-work.js) | **Destinations** + **The Collective** pages | Drives the sticky-video scroll-reveal service cards, confirmed live on **both** Destinations and The Collective (each with its own copy/framing). Also drives the spatial member-card slider and bio "read more" toggle, which are Collective-only. A third feature that used to live here — a radial cards slider — was removed from the live site; only orphaned CSS referencing it remains, and the corresponding JS has been cleaned out of this file. |
 
 <Warning>
   **Do not delete or edit custom code unless you are explicitly instructed to.** These files are tightly coupled to specific class names and data attributes in the Webflow structure — small changes on either side (Webflow structure or the JS) can silently break animations.
