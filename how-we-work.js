@@ -1,4 +1,4 @@
-console.log('the-collective.js loaded');
+console.log('how-we-work.js loaded');
 
 gsap.registerPlugin(SplitText, ScrollTrigger);
 
