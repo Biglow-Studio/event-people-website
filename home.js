@@ -619,32 +619,3 @@ function initHeroVideoObjectPosition() {
 document.addEventListener('DOMContentLoaded', () => {
     initHeroVideoObjectPosition();
 });
-
-const hoverSound = new Audio(
-    'https://cdn.prod.website-files.com/6a6a64981fd0e1b6348ade7b/6a715010cc1913997805ba12_ES_User%20Interface%2C%20Click%2C%20Tech%20Button%2005%20-%20Epidemic%20Sound.mp3',
-);
-hoverSound.crossOrigin = 'anonymous';
-
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-const source = audioCtx.createMediaElementSource(hoverSound);
-
-// Lowpass filter, lower frequency = more muffled
-const filter = audioCtx.createBiquadFilter();
-filter.type = 'lowpass';
-filter.frequency.value = 3000;
-
-// Gain node controls output volume, 0 to 1
-const gain = audioCtx.createGain();
-gain.gain.value = 0.1;
-
-source.connect(filter);
-filter.connect(gain);
-gain.connect(audioCtx.destination);
-
-/*document.querySelectorAll(".footer-link, .table-row").forEach((link) => {
-    link.addEventListener("mouseenter", () => {
-      if (audioCtx.state === "suspended") audioCtx.resume();
-      hoverSound.currentTime = 0;
-      hoverSound.play();
-    });
-  });*/

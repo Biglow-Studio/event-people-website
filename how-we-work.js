@@ -1,5 +1,3 @@
-console.log('how-we-work.js loaded');
-
 gsap.registerPlugin(SplitText, ScrollTrigger);
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -18,10 +16,16 @@ document.addEventListener('DOMContentLoaded', () => {
     //
     // Both the heading (service name) and description split by word — a char split on the
     // heading was wrapping badly, so both use the same split type here.
+    //
+    // Items hidden in Webflow (display:none) are skipped. Each item gets a full slot of the
+    // scroll range, so a hidden item left a stretch at the end of the pinned section where
+    // scrolling changed nothing on screen — the "stuck mid-scroll" feel.
     function initStickyVideoReveal() {
         const section = document.querySelector('.section.sticky-video');
         const wrapper = section ? section.querySelector('.video-features-wrapper') : null;
-        const items = wrapper ? Array.from(wrapper.querySelectorAll('.video-featured-item')) : [];
+        const items = wrapper
+            ? Array.from(wrapper.querySelectorAll('.video-featured-item')).filter(item => getComputedStyle(item).display !== 'none')
+            : [];
         if (!section || !wrapper || !items.length) return;
 
         const splitSpecByItem = items.map(item => {

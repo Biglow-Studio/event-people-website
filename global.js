@@ -1,7 +1,5 @@
 gsap.registerPlugin(SplitText, ScrollTrigger);
 
-
-console.log('global.js loaded');
 document.addEventListener('DOMContentLoaded', () => {
 
     // ─── Split text config ───────────────────────────────────────────────────
