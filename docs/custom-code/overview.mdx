@@ -5,22 +5,22 @@ description: What the four project JS files do, their dependencies, and current 
 
 Custom code here is JavaScript layered on top of Webflow's standard build — almost entirely GSAP-driven scroll and interaction animation (sliders, pinned sections, split-text reveals, etc.), plus one smooth-scroll library.
 
-<Warning>
-  **Current state as of this handoff:** the project's custom-code files live in this repo but are **not yet wired into Webflow** — no scripts are currently registered or applied at the site or page level. The only custom code already live on the site is the Lenis smooth-scroll snippet described below. See [Hosting the Custom Code](/custom-code/hosting) to wire them in.
-</Warning>
+<Note>
+  **Current state:** the three live files are wired into Webflow and served from jsDelivr, pinned to the repo's `v1.0.0` tag — `global.js` site-wide via the site footer code, `home.js` on Home, and `how-we-work.js` on European Hubs and New York. About Us and Contact have no page-level code. Pushing to `main` alone doesn't change the live site — see [Hosting the Custom Code](/custom-code/hosting) for the exact snippets and how to ship a change.
+</Note>
 
 ## The four project files
 
 <Info>
-  **Verified against the live staging site** (`event-people-reworked.webflow.io`) on 2026-09-08. Webflow structure can drift from the code without warning — re-check before wiring anything in if it's been a while.
+  **Last reconciled with the Webflow site in September 2026**, after the European Hubs / New York restructure. Webflow structure can drift from the code without warning — re-check before changing either side if it's been a while.
 </Info>
 
 | File | Scope | What it drives |
 |---|---|---|
-| [`global.js`](https://github.com/tamyankevich/EP-rework/blob/main/global.js) | **Site-wide** | Nav menu open/close animation and content stagger; hides the nav bar once the footer scrolls into view. Runs on every page. Confirmed live on all pages. |
-| [`home.js`](https://github.com/tamyankevich/EP-rework/blob/main/home.js) | **Home** page only | Cascading image slider, sticky steps indicator, hero video object-position handling, a hover sound effect (currently commented out/disabled in the code). |
-| [`about.js`](https://github.com/tamyankevich/EP-rework/blob/main/about.js) | **Deprecated — not in use** | Built for an earlier About page layout: a pinned visuals column against a step timeline, plus an interactive image collage. The About page's current bio/text layout is the intended, permanent version going forward, so none of that markup exists and this file will not be wired in. Kept in the repo for reference only — see [Hosting the Custom Code](/custom-code/hosting). |
-| [`how-we-work.js`](https://github.com/tamyankevich/EP-rework/blob/main/how-we-work.js) | **Destinations** + **The Collective** pages | Drives the sticky-video scroll-reveal service cards, confirmed live on **both** Destinations and The Collective (each with its own copy/framing). Also drives the spatial member-card slider and bio "read more" toggle, which are Collective-only. A third feature that used to live here — a radial cards slider — was removed from the live site; only orphaned CSS referencing it remains, and the corresponding JS has been cleaned out of this file. |
+| [`global.js`](https://github.com/Biglow-Studio/event-people-website/blob/main/global.js) | **Site-wide** | Nav menu open/close animation and content stagger; hides the nav bar once the footer scrolls into view. Loaded from the site footer code, so it runs on every page. |
+| [`home.js`](https://github.com/Biglow-Studio/event-people-website/blob/main/home.js) | **Home** page only | Cascading image slider, sticky steps indicator, hero video object-position handling. |
+| [`about.js`](https://github.com/Biglow-Studio/event-people-website/blob/main/about.js) | **Deprecated — not in use** | Built for an earlier About page layout: a pinned visuals column against a step timeline, plus an interactive image collage. The current About Us page doesn't use any of that markup, so this file will not be wired in. Kept in the repo for reference only — see [Hosting the Custom Code](/custom-code/hosting). |
+| [`how-we-work.js`](https://github.com/Biglow-Studio/event-people-website/blob/main/how-we-work.js) | **European Hubs** + **New York** pages | Drives the "how we work" sticky-video scroll reveal on **both** European Hubs and New York. Items hidden in Webflow (`display: none`) are skipped — a hidden item used to leave dead scroll at the end of the pinned section. The file still contains the spatial member-card slider (`initSpatialCardsSlider`) and bio "read more" toggle (`initCollectiveCardBios`), but both are now inert: the representatives section was redesigned in Webflow as a static grid, with no `data-spatial-slider-init` attribute or `.read-more-button` in the markup, so both return early. A third feature that used to live here — a radial cards slider — was removed from the live site; only orphaned CSS referencing it remains, and the corresponding JS has been cleaned out of this file. |
 
 <Warning>
   **Do not delete or edit custom code unless you are explicitly instructed to.** These files are tightly coupled to specific class names and data attributes in the Webflow structure — small changes on either side (Webflow structure or the JS) can silently break animations.
@@ -30,11 +30,15 @@ Custom code here is JavaScript layered on top of Webflow's standard build — al
 
 These files depend on **GSAP** and several of its plugins, loaded *before* the project files:
 
-- Core: `gsap`
-- Plugins used somewhere across the four files: `ScrollTrigger`, `SplitText`, `CustomEase`, `Draggable`, `InertiaPlugin`, `Observer`
+- Core: `gsap` 3.15 and `ScrollTrigger`, loaded site-wide by Webflow's built-in GSAP integration. Don't add `gsap.min.js` again.
+- `SplitText`: site footer code, every page. `global.js` calls `gsap.registerPlugin(SplitText, ScrollTrigger)`, which is why it loads site-wide.
+- `Observer`: Home page code.
+- `Draggable`, `InertiaPlugin`, `CustomEase`: European Hubs and New York page code. `how-we-work.js` registers them as soon as it loads (and throws an error without them), so keep these tags even though the member-card slider that uses them is inert.
+
+The plugins load from the `gsap@3.15` package on jsDelivr, matching the core version. Exact script tags are on [Hosting the Custom Code](/custom-code/hosting#where-each-file-needs-to-go-in-webflow).
 
 <Info>
-  GSAP's previously-paid "Club GreenSock" plugins (SplitText, Draggable, InertiaPlugin, Observer, CustomEase) became free for everyone following Webflow's 2025 acquisition of GreenSock — confirm current licensing/CDN links at [gsap.com](https://gsap.com) before wiring these in, but no paid key should be required today.
+  GSAP's formerly paid "Club GreenSock" plugins (including SplitText and InertiaPlugin) became free for everyone following Webflow's acquisition of GreenSock, so no paid key is required. See [gsap.com](https://gsap.com) for current licensing.
 </Info>
 
-Already live and unrelated to this repo: a **Lenis** smooth-scroll script is loaded site-wide via Project Settings → Custom Code → Footer Code, pulled directly from a public CDN. Leave this as-is unless you're deliberately replacing it.
+Also in the site footer code, and not part of this repo: **Lenis** smooth scrolling (`lenis@1.3.26` from unpkg), started with `new Lenis({ autoRaf: true })`. Leave this as-is unless you're deliberately replacing it.

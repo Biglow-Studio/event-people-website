@@ -5,11 +5,13 @@ description: Field reference and editing workflow for the Collective members and
 
 Dynamic content comes from the Webflow **CMS**. Event People has two collections — **Collective members** and **Destinations** — and they're linked: a Destination references the Collective members featured on it.
 
+Collective members feed the representatives grids on **European Hubs** and **New York**. The Destinations page is currently in Draft — see [Destinations collection](#destinations-collection).
+
 Members with the **content editor** role or higher can create, edit, delete, and import/export CMS items.
 
 ## Collective members collection
 
-Slug: `collaborators` · used on **The Collective** page and its detail template.
+Slug: `collaborators` · used on the **European Hubs** and **New York** pages (the representatives grids) and its detail template.
 
 | Field | Type | Notes |
 |---|---|---|
@@ -17,13 +19,36 @@ Slug: `collaborators` · used on **The Collective** page and its detail template
 | Slug * | Plain text | Required — auto-generated from Name, but editable. Changing it after publishing breaks any links to that member's page. |
 | Role | Plain text | Job title. |
 | Company | Plain text | |
-| Country | Plain text | |
-| Bio | Plain text | Max 250 characters — this is a card/summary length field, not a full profile. |
+| Country | Plain text | Decides which page the member appears on — see below. |
+| Bio | Plain text | Max 250 characters — this is a card/summary length field, not a full profile. Shown in full on the representatives grid; European Hubs only lists members that have one. |
 | Photo | Image | |
+
+### Which page a member appears on
+
+Each page's representatives grid is a collection list with filters set in the Designer (select the list → element **Settings → Filters**):
+
+| Page | Filters |
+|---|---|
+| European Hubs | `Country ≠ New York` **and** `Bio is set` |
+| New York | `Country = New York` |
+
+To show a representative on a page, set the member's **Country** (exactly `New York` for the New York page, any other country for European Hubs), make sure the **Bio** is filled in, and publish the item. Changing the filters themselves is Designer work.
+
+<Note>
+  Older placeholder members without a bio stay hidden by the `Bio is set` filter — adding a bio to one will make it appear on European Hubs. They couldn't simply be unpublished because Destinations items still reference them.
+</Note>
+
+<Note>
+  Shawn Rolph's title ("Growth Strategist") and photo are placeholders pending confirmation.
+</Note>
 
 ## Destinations collection
 
 Slug: `destinations` · used on the **Destinations** page and its detail template.
+
+<Note>
+  The Destinations page was replaced by **New York** in September 2026 and set to **Draft** (not deleted). The collection and its items still exist, and its Collaborators references still point at Collective members.
+</Note>
 
 | Field | Type | Notes |
 |---|---|---|

@@ -11,14 +11,14 @@ The site is built and hosted on **Webflow**.
   <Card title="Webflow" icon="webflow">
     The website builder, CMS, form storage, and hosting platform. Where you edit pages and CMS content, and publish updates.
   </Card>
-  <Card title="GitHub" icon="github" href="https://github.com/tamyankevich/EP-rework">
-    Source of truth for the four custom-code JavaScript files — see [Custom Code Overview](/custom-code/overview). Not connected to Webflow directly today.
+  <Card title="GitHub" icon="github" href="https://github.com/Biglow-Studio/event-people-website">
+    Public repo (`Biglow-Studio/event-people-website`, branch `main`) and source of truth for the four custom-code JavaScript files and these docs — see [Custom Code Overview](/custom-code/overview). Webflow doesn't pull from it directly.
   </Card>
-  <Card title="Bunny.net (recommended CDN)" icon="cloud">
-    Recommended host for the custom-code files (and any large media) if you take over hosting. You'll only touch this when updating a file version or setting up hosting for the first time.
+  <Card title="jsDelivr" icon="globe">
+    Public CDN that serves the JS files to the site straight from the GitHub repo, pinned to a release tag (currently `v1.0.0`). No account needed. You'll only touch these URLs when shipping a new version — see [Hosting the Custom Code](/custom-code/hosting).
   </Card>
-  <Card title="Cloudflare (alternative CDN)" icon="cloudflare">
-    A solid alternative to Bunny — Cloudflare Pages for static files, or R2 + a Worker/CDN in front of it. Slightly more setup, useful if you already standardize on Cloudflare.
+  <Card title="Bunny.net / Cloudflare (optional)" icon="cloud">
+    Not used today. Options for hosting large media outside Webflow, or for self-hosting the JS files if they ever have to move off jsDelivr.
   </Card>
 </CardGroup>
 
@@ -31,8 +31,9 @@ The site is built and hosted on **Webflow**.
 To maintain the site, you will need access to:
 
 - **Webflow Workspace** — Editor/content-editor access is usually enough for content work; Designer access is more powerful and needed for anything under "Please do not do without support" on the [Overview](/) page.
-- **The custom-code GitHub repo** — only needed for development work. Ask for it to be transferred or for collaborator access.
-- **Bunny.net or Cloudflare** — only if you're setting up or maintaining self-hosted custom code.
+- **The custom-code GitHub repo** ([Biglow-Studio/event-people-website](https://github.com/Biglow-Studio/event-people-website)) — only needed for development work. It's public, so anyone can read it; ask for collaborator access if you need to push changes or tag a release. jsDelivr needs no account.
+- **Bunny.net or Cloudflare** — only if you move the custom code to self-hosting or host large media outside Webflow.
+- **Mintlify** — only needed to manage this docs site; see [Publishing these docs](/publishing-and-support#publishing-these-docs).
 
 <Warning>
   **Best practice:** use individual logins when possible. Avoid sharing a single password across a team.
@@ -59,7 +60,7 @@ Use content editing mode when you are updating page copy, links, and images; CMS
 
 ### Webflow Designer (use with caution)
 
-Use the Designer when you are adjusting CMS templates and collection pages; updating collection structure and settings (fields, validations, etc.); working with components, symbols, styles, and interactions; managing redirects; or touching any custom code.
+Use the Designer when you are adjusting CMS templates, collection pages, and collection list filters; updating collection structure and settings (fields, validations, etc.); working with components, symbols, styles, and interactions; managing redirects; or touching any custom code.
 
 <Warning>
   If you are not comfortable in the Designer, stick to content editing mode and request support for Designer-level changes.

@@ -1,6 +1,6 @@
 ---
 title: Publishing, Backups & Support
-description: Rollback guidance and where to escalate issues beyond routine content updates.
+description: Rollback guidance, how these docs are published, and where to escalate issues beyond routine content updates.
 ---
 
 ## Publishing, backups, and rollback
@@ -20,6 +20,15 @@ If something breaks:
 
 - Revert the content change if possible.
 - If it was a layout/code change, pause publishing and request support.
+- If a new custom-code release caused it, point the script URLs back at the previous tag and republish — see [Hosting the Custom Code](/custom-code/hosting#shipping-a-change-to-a-js-file).
+
+## Publishing these docs
+
+These docs live in the `docs/` folder of [Biglow-Studio/event-people-website](https://github.com/Biglow-Studio/event-people-website) and are published by Mintlify at [event-people.mintlify.site](https://event-people.mintlify.site).
+
+<Warning>
+  The Mintlify project was connected to the old repo. Until it's reconnected to `Biglow-Studio/event-people-website` in the Mintlify dashboard (GitHub app, with `/docs` as the docs path), docs changes won't deploy.
+</Warning>
 
 ## Support / escalation
 

@@ -1,11 +1,120 @@
 ---
 title: Hosting the Custom Code
-description: How to host the four JS files on a CDN and wire them into Webflow's Custom Code settings.
+description: How the JS files are served from jsDelivr, where they're wired into Webflow's Custom Code settings, and how to ship a change.
 ---
+
+## How the files are served
+
+The JS files are served by **jsDelivr**, straight from the public GitHub repo [Biglow-Studio/event-people-website](https://github.com/Biglow-Studio/event-people-website), pinned to a git tag rather than a branch:
+
+```text
+https://cdn.jsdelivr.net/gh/Biglow-Studio/event-people-website@v1.0.0/<file>.js
+```
+
+There's no upload step or account — once a tag is pushed to GitHub, jsDelivr can serve it. jsDelivr only serves public repos, so the repo needs to stay public for this setup to work.
+
+<Note>
+  **Why a tag, not `@main`:** jsDelivr caches `@main` URLs for hours, so pushed fixes don't reliably show up on the site. Tagged URLs are immutable — `@v1.0.0` always serves the same files. The flip side: pushing to `main` changes nothing on the live site until the script URLs in Webflow point at a new tag.
+</Note>
+
+## Where each file needs to go in Webflow
+
+This is the current wiring. Every project-file URL uses the same tag (currently `v1.0.0`).
+
+<Note>
+  `about.js` is intentionally excluded below. The current About Us page doesn't use its markup, so this file is deprecated and should not be wired in — see [Custom Code Overview](/custom-code/overview).
+</Note>
+
+<Steps>
+  <Step title="GSAP core + ScrollTrigger → Webflow's GSAP integration">
+    Webflow's built-in GSAP integration already loads GSAP core 3.15 and ScrollTrigger on every page. **Don't add `gsap.min.js` again.**
+  </Step>
+  <Step title="global.js → site-wide">
+    **Site settings → Custom code → Footer code.** Lenis smooth scrolling and SplitText load here too — `global.js` calls `gsap.registerPlugin(SplitText, ScrollTrigger)`, so SplitText has to be on every page.
+
+    ```html
+    <script src="https://unpkg.com/lenis@1.3.26/dist/lenis.min.js"></script>
+    <script>
+      // Smooth scrolling
+      const lenis = new Lenis({ autoRaf: true });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15/dist/SplitText.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/Biglow-Studio/event-people-website@v1.0.0/global.js"></script>
+    ```
+  </Step>
+  <Step title="home.js → Home page">
+    **Home → Page settings → Custom code → Before `</body>` tag.**
+
+    ```html
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15/dist/Observer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/Biglow-Studio/event-people-website@v1.0.0/home.js"></script>
+    ```
+  </Step>
+  <Step title="how-we-work.js → two pages">
+    The same code on **both** the **European Hubs** page **and** the **New York** page → Page settings → Custom code → Before `</body>` tag on each.
+
+    ```html
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15/dist/Draggable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15/dist/InertiaPlugin.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15/dist/CustomEase.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/Biglow-Studio/event-people-website@v1.0.0/how-we-work.js"></script>
+    ```
+
+    `how-we-work.js` registers Draggable, InertiaPlugin, and CustomEase as soon as it loads, so keep those three tags even though the member-card slider that uses them is inert.
+  </Step>
+  <Step title="About Us and Contact → no page-level code">
+    `global.js` reaches them through the site footer code.
+  </Step>
+</Steps>
+
+<Warning>
+  Keep the load order consistent everywhere: GSAP core (Webflow's integration) → GSAP plugins → the relevant project file(s). Loading a project file before its GSAP dependencies is a common cause of "the animation just doesn't run" bugs. The plugin URLs are pinned to `gsap@3.15` to match the core version Webflow loads.
+</Warning>
+
+### Where custom code may be located, generally
+
+- Site settings → Custom code (site-wide header/footer snippets).
+- Page settings → Custom code (page-specific snippets).
+- Embedded code blocks on a page.
+- External files — currently this repo's JS files, served by jsDelivr.
+
+## Shipping a change to a JS file
+
+<Steps>
+  <Step title="Commit and push to main">
+    ```bash
+    git add how-we-work.js
+    git commit -m "Describe the change"
+    git push origin main
+    ```
+
+    This alone doesn't change the live site.
+  </Step>
+  <Step title="Create and push a new tag">
+    Bump from the latest tag (`git tag` lists them), e.g. `v1.0.0` → `v1.0.1`:
+
+    ```bash
+    git tag -a v1.0.1 -m "Describe the release"
+    git push origin v1.0.1
+    ```
+
+    Never move or re-push an existing tag — jsDelivr may keep serving the files it already cached for it. Always create a new one.
+  </Step>
+  <Step title="Update the script URLs in Webflow">
+    Replace the tag (currently `@v1.0.0`) with the new one in all four places: **Site settings → Custom code → Footer code** (`global.js`), and the page-level code on **Home** (`home.js`), **European Hubs**, and **New York** (`how-we-work.js`). Only the `event-people-website@…` URLs change — leave the GSAP and Lenis URLs as they are.
+  </Step>
+  <Step title="Republish the site">
+    Custom code changes only go live once the site is published.
+  </Step>
+</Steps>
+
+<Tip>
+  To roll back a bad release, point the URLs back at the previous tag and republish — old tags keep serving the same files.
+</Tip>
 
 ## Media and file storage
 
-For most day-to-day content edits, uploading directly through Webflow's native asset picker on an Image field is enough — you don't need Bunny or Cloudflare at all. Only use an external CDN if you're hosting large/optimized media outside Webflow, or hosting the custom-code files below.
+For most day-to-day content edits, uploading directly through Webflow's native asset picker on an Image field is enough — you don't need Bunny or Cloudflare at all. Neither is used today. Only use an external CDN if you're hosting large/optimized media outside Webflow, or if the custom-code files ever have to move off jsDelivr (for example, if the repo can't stay public).
 
 <Tabs>
   <Tab title="Bunny.net (recommended)">
@@ -31,37 +140,3 @@ For most day-to-day content edits, uploading directly through Webflow's native a
     - Either way, copy the resulting HTTPS URL for each file the same way you would a Bunny URL.
   </Tab>
 </Tabs>
-
-## Where each file needs to go in Webflow
-
-Once the files are hosted and you have a stable HTTPS URL for each:
-
-<Note>
-  `about.js` is intentionally excluded below. The About page's current bio/text layout is permanent, so this file is deprecated and should not be wired in — see [Custom Code Overview](/custom-code/overview).
-</Note>
-
-<Steps>
-  <Step title="Load GSAP + plugins first">
-    On every page that uses any custom code — in practice, that's every page because of `global.js`. Add the GSAP script tags in **Project Settings → Custom Code → Footer Code** (site-wide), *above* where `global.js` will be referenced.
-  </Step>
-  <Step title="global.js → site-wide">
-    Also in **Project Settings → Custom Code → Footer Code**, as a script tag, after the GSAP tags. It must run on every page.
-  </Step>
-  <Step title="home.js → Home page">
-    **Home page → Page Settings → Custom Code → Before `</body>`**.
-  </Step>
-  <Step title="how-we-work.js → two pages">
-    Applied on **both** the **Destinations** page **and** **The Collective** page → Page Settings → Custom Code → Before `</body>` on each.
-  </Step>
-</Steps>
-
-<Warning>
-  Keep the load order consistent everywhere: GSAP core → GSAP plugins → the relevant project file(s). Loading a project file before its GSAP dependencies is a common cause of "the animation just doesn't run" bugs.
-</Warning>
-
-### Where custom code may be located, generally
-
-- Project Settings → Custom Code (site-wide header/footer snippets).
-- Page Settings → Custom Code (page-specific snippets).
-- Embedded code blocks on a page.
-- External files hosted on Bunny.net or Cloudflare.
