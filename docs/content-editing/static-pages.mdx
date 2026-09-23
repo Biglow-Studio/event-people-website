@@ -43,6 +43,36 @@ Not in the nav:
   </Step>
 </Steps>
 
+## Home: the case-study slider
+
+The cascading image slider on the Home page is plain Webflow markup — one `.cascading-slider__item`
+per case study, each holding an image (`.cascading-slider__img`) and a caption
+(`.cascading-slider__h`). It currently holds 12.
+
+<Note>
+  **It takes any number of slides.** `home.js` reads however many `[data-cascading-slide]` elements
+  exist, writes the real count into `[data-slider-index-total]`, and only clones slides to pad the
+  carousel if there are fewer than 9. Adding a case study is a photo plus a name — no code change.
+</Note>
+
+<Steps>
+  <Step title="Duplicate an existing slide">
+    Select a `cascading-slider__item` in the Navigator and press ⌘D / Ctrl+D.
+  </Step>
+  <Step title="Swap the image">
+    Select the image inside it, then **Settings → Replace image** and pick the new asset.
+  </Step>
+  <Step title="Rename the caption">
+    Select the heading inside it and set **Settings → Text**.
+  </Step>
+</Steps>
+
+<Warning>
+  In the Designer the slides stack to zero width, because the page's custom code (which lays the
+  slider out) doesn't run on the canvas. That's expected — check the slider on the staging site, not
+  in the Designer.
+</Warning>
+
 ## Before you publish, double-check
 
 - Links work (especially buttons and navigation).

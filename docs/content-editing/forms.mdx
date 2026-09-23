@@ -6,10 +6,29 @@ description: Where contact form submissions live, and how to work with them.
 Event People has one native Webflow form:
 
 <Card title="Contact Form" icon="envelope">
-  On the **Contact Us** page. Fields: Name, Email, Event-Type, Comment.
+  On the **Contact Us** page. Fields, in order: Name, Email, Event-Type,
+  Where-Did-You-Find-Us, Where-Did-You-Find-Us-Other, Comment.
 
   *Renamed from its original placeholder name "Example Form" for clarity in the Forms panel.*
 </Card>
+
+## "Where did you find us?"
+
+A Select Field with the choices **LinkedIn · Google · An AI engine · YouTube · Instagram · Other**,
+followed by an optional text field (**If other, please tell us where**) that only appears when
+**Other** is picked.
+
+<Note>
+  The show/hide toggle is **not** in this repo. It lives in the Contact page's own custom code —
+  Webflow: page settings → **Before `</body>` tag**. It's a handful of lines that match the select
+  `#Where-Did-You-Find-Us` to the input `#Where-Did-You-Find-Us-Other` and hide that input's
+  `.input-group` unless the value is `Other`. It was kept page-level so the site-wide script tag
+  didn't need a new jsDelivr version for one page's form — see [Hosting the Custom Code](/custom-code/hosting).
+</Note>
+
+To change the choices: select the dropdown on the canvas, then **Settings → Select Field settings →
+Choices**. Set both **Text** and **Value** on each choice, and keep an option whose value is exactly
+`Other`, or the extra text field will never appear.
 
 ## Finding submissions
 
