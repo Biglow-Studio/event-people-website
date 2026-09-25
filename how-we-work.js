@@ -638,3 +638,369 @@ function initCollectiveCardBios() {
 document.addEventListener('DOMContentLoaded', () => {
   initSpatialCardsSlider();
 });
+
+// ─── Representatives: Home-style cascading slider ────────────────────────────
+// Opt-in per list: a `.collective-gsap-slider` carrying the `data-rep-slider` attribute
+// (European Hubs). The CMS list stays the source of truth, and the Designer keeps showing
+// it as the plain card grid. At runtime each card is read and rebuilt as the Home
+// case-study slider (same `.cascading-slider*` classes, same slot maths as
+// initCascadingSlider in home.js), with a panel under it showing the active person's
+// role, name, country and bio. Unlike Home there is no autoplay, so a bio never changes
+// under someone who is reading it: prev/next, clicking a neighbouring photo, swiping and
+// the arrow keys (while the slider is on screen) move it. The CSS lives in the page's
+// own custom code. Home's own slider attributes (data-cascading-*) are deliberately not
+// used, so home.js could never pick this one up as well.
+function initRepSliders() {
+    document.querySelectorAll('[data-rep-slider]').forEach(root => {
+        if (root.hasAttribute('data-rep-slider-ready')) return;
+
+        const reps = Array.from(root.querySelectorAll('.w-dyn-item')).map(readRep).filter(rep => rep.name);
+        if (reps.length < 2) return;
+
+        const slider = buildRepSlider(reps);
+        root.appendChild(slider.el);
+        root.setAttribute('data-rep-slider-ready', '');
+        setupRepCascade(slider, reps.length);
+    });
+
+    function readRep(item) {
+        const text = selector => {
+            const el = item.querySelector(selector);
+            return el ? el.textContent.trim() : '';
+        };
+        const img = item.querySelector('img');
+
+        return {
+            name: text('.team-card__name'),
+            role: text('.demo-card__h-2'),
+            country: text('.team-card__country'),
+            bio: text('.bio-text-content'),
+            img: img ? { src: img.getAttribute('src'), srcset: img.getAttribute('srcset') } : null,
+        };
+    }
+}
+
+function buildRepSlider(reps) {
+    // CMS text only ever goes in through textContent.
+    const make = (tag, className, attrs, text) => {
+        const el = document.createElement(tag);
+        if (className) el.className = className;
+        Object.entries(attrs || {}).forEach(([name, value]) => {
+            if (value !== null && value !== undefined) el.setAttribute(name, value);
+        });
+        if (text) el.textContent = text;
+        return el;
+    };
+
+    // Same arrow as the Home slider buttons; the prev button mirrors it via .invert-button.
+    const arrow = () => {
+        const ns = 'http://www.w3.org/2000/svg';
+        const svg = document.createElementNS(ns, 'svg');
+        svg.setAttribute('width', '27');
+        svg.setAttribute('height', '11');
+        svg.setAttribute('viewBox', '0 0 27 11');
+        svg.setAttribute('fill', 'none');
+        svg.setAttribute('aria-hidden', 'true');
+        const path = document.createElementNS(ns, 'path');
+        path.setAttribute('d', 'M3.53522e-06 6.39362C7.61822 6.39362 18.3595 6.62812 18.9698 6.84797C19.5802 7.06783 19.8853 8.4037 19.8853 9.23927L19.8853 10.8865C21.1529 9.16765 22.7724 7.63743 26.9817 5.48136C22.7724 2.85285 21.1529 1.71889 19.8853 -3.10192e-07L19.8853 1.64726C19.8853 2.48283 19.5802 3.81871 18.9698 4.03856C18.3595 4.25842 7.61822 4.49292 3.61831e-06 4.49292L3.53522e-06 6.39362Z');
+        path.setAttribute('fill', 'currentColor');
+        svg.appendChild(path);
+        return svg;
+    };
+
+    const pad = value => String(value).padStart(2, '0');
+
+    const el = make('div', 'rep-slider');
+    const stage = make('div', 'cascading-slider rep-slider__stage', {
+        role: 'region',
+        'aria-roledescription': 'carousel',
+        'aria-label': 'Event People representatives',
+    });
+    const collection = make('div', 'cascading-slider__collection');
+    const viewport = make('div', 'cascading-slider__list');
+
+    const slides = reps.map((rep, index) => {
+        const slide = make('div', 'cascading-slider__item', {
+            role: 'group',
+            'aria-roledescription': 'slide',
+            'aria-label': `${rep.name} (${index + 1} of ${reps.length})`,
+            'data-status': index === 0 ? 'active' : 'inactive',
+        });
+        const inner = make('div', 'cascading-slider__item-inner');
+        const bg = make('div', 'cascading-slider__item-bg');
+        if (rep.img && rep.img.src) {
+            bg.appendChild(make('img', 'cascading-slider__img', {
+                src: rep.img.src,
+                srcset: rep.img.srcset,
+                sizes: rep.img.srcset ? '(max-width: 767px) 80vw, 60vw' : null,
+                alt: '',
+                loading: 'lazy',
+                draggable: 'false',
+            }));
+        }
+        const content = make('div', 'cascading-slider__item-content');
+        content.appendChild(make('h3', 'cascading-slider__h', null, rep.name));
+        inner.append(bg, content);
+        slide.appendChild(inner);
+        viewport.appendChild(slide);
+        return slide;
+    });
+
+    collection.appendChild(viewport);
+    stage.appendChild(collection);
+
+    const footer = make('div', 'rep-slider__footer');
+    const nav = make('nav', 'rep-slider__nav', { 'aria-label': 'Representatives' });
+    const counter = make('div', 'rep-slider__count', { 'aria-hidden': 'true' });
+    const current = make('span', 'rep-slider__count-current', null, pad(1));
+    counter.append(current, make('span', 'rep-slider__count-sep', null, '/'), make('span', null, null, pad(reps.length)));
+    const prev = make('button', 'cascading-slider__button invert-button', { type: 'button', 'aria-label': 'Previous representative' });
+    prev.appendChild(arrow());
+    const next = make('button', 'cascading-slider__button', { type: 'button', 'aria-label': 'Next representative' });
+    next.appendChild(arrow());
+    nav.append(counter, prev, next);
+
+    // Every bio is rendered and stacked in one grid cell, so the panel is always as tall
+    // as the longest bio and the page below never jumps when the slide changes.
+    const details = make('div', 'rep-slider__details', { 'aria-live': 'polite' });
+    const detailCards = reps.map((rep, index) => {
+        const card = make('article', 'rep-slider__detail', { 'data-status': index === 0 ? 'active' : 'inactive' });
+        if (rep.role) card.appendChild(make('p', 'rep-slider__role', null, rep.role));
+        card.appendChild(make('h3', 'rep-slider__name', null, rep.name));
+        if (rep.country) card.appendChild(make('p', 'rep-slider__country', null, rep.country));
+        if (rep.bio) card.appendChild(make('p', 'rep-slider__bio', null, rep.bio));
+        details.appendChild(card);
+        return card;
+    });
+
+    footer.append(nav, details);
+    el.append(stage, footer);
+
+    return { el, stage, viewport, slides, prev, next, current, detailCards, pad };
+}
+
+function setupRepCascade(slider, count) {
+    const { stage, viewport, prev, next, current, detailCards, pad } = slider;
+    const slides = slider.slides.slice();
+    const duration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 0.65;
+    const ease = 'power3.inOut';
+
+    // Slot widths as fractions of the slider width, per Webflow breakpoint — as on Home.
+    const breakpoints = [
+        { maxWidth: 479, activeWidth: 0.78, siblingWidth: 0.08 },
+        { maxWidth: 767, activeWidth: 0.7, siblingWidth: 0.1 },
+        { maxWidth: 991, activeWidth: 0.6, siblingWidth: 0.1 },
+        { maxWidth: Infinity, activeWidth: 0.6, siblingWidth: 0.13 },
+    ];
+
+    // The layout needs at least 9 slides (five visible slots plus parked ones either side),
+    // so a short list is padded with clones, as on Home. Slide i shows representative
+    // i % count.
+    const originals = slides.slice();
+    while (slides.length < 9) {
+        originals.forEach(original => {
+            const clone = original.cloneNode(true);
+            clone.setAttribute('data-clone', '');
+            clone.setAttribute('aria-hidden', 'true');
+            viewport.appendChild(clone);
+            slides.push(clone);
+        });
+    }
+    const total = slides.length;
+
+    let activeIndex = 0;
+    let isAnimating = false;
+    let slideWidth = 0;
+    const slotCenters = {};
+    const slotWidths = {};
+
+    function getSettings() {
+        return breakpoints.find(breakpoint => window.innerWidth <= breakpoint.maxWidth);
+    }
+
+    function getOffset(slideIndex, fromIndex = activeIndex) {
+        let distance = slideIndex - fromIndex;
+        const half = total / 2;
+        if (distance > half) distance -= total;
+        if (distance < -half) distance += total;
+        return distance;
+    }
+
+    function measure() {
+        const settings = getSettings();
+        const viewportWidth = viewport.offsetWidth;
+        const gap = parseFloat(getComputedStyle(viewport).columnGap) || 0;
+
+        const activeWidth = viewportWidth * settings.activeWidth;
+        const siblingWidth = viewportWidth * settings.siblingWidth;
+        const farWidth = Math.max(0, (viewportWidth - activeWidth - 2 * siblingWidth - 4 * gap) / 2);
+        slideWidth = activeWidth;
+
+        const visibleSlots = [
+            { slot: -2, width: farWidth },
+            { slot: -1, width: siblingWidth },
+            { slot: 0, width: activeWidth },
+            { slot: 1, width: siblingWidth },
+            { slot: 2, width: farWidth },
+        ];
+
+        let x = 0;
+        visibleSlots.forEach((def, i) => {
+            slotCenters[def.slot] = x + def.width / 2;
+            slotWidths[def.slot] = def.width;
+            if (i < visibleSlots.length - 1) x += def.width + gap;
+        });
+
+        slotCenters[-3] = slotCenters[-2] - farWidth - gap;
+        slotWidths[-3] = farWidth;
+        slotCenters[3] = slotCenters[2] + farWidth + gap;
+        slotWidths[3] = farWidth;
+
+        slides.forEach(slide => {
+            slide.style.width = slideWidth + 'px';
+        });
+    }
+
+    function getSlideProps(offset) {
+        const clamped = Math.max(-3, Math.min(3, offset));
+        return {
+            x: slotCenters[clamped] - slideWidth / 2,
+            '--clip': Math.max(0, (slideWidth - slotWidths[clamped]) / 2),
+            zIndex: 10 - Math.abs(clamped),
+        };
+    }
+
+    function layout(animate, previousIndex) {
+        slides.forEach((slide, index) => {
+            const offset = getOffset(index);
+            slide.setAttribute('data-status', offset === 0 ? 'active' : 'inactive');
+
+            if (offset < -3 || offset > 3) {
+                if (animate && previousIndex !== undefined) {
+                    const previousOffset = getOffset(index, previousIndex);
+                    if (previousOffset >= -2 && previousOffset <= 2) {
+                        gsap.to(slide, { ...getSlideProps(previousOffset < 0 ? -3 : 3), duration, ease, overwrite: true });
+                        return;
+                    }
+                }
+                gsap.set(slide, getSlideProps(offset < 0 ? -3 : 3));
+                return;
+            }
+
+            const props = getSlideProps(offset);
+            if (animate) gsap.to(slide, { ...props, duration, ease, overwrite: true });
+            else gsap.set(slide, props);
+        });
+    }
+
+    function showActiveDetails() {
+        const repIndex = activeIndex % count;
+        current.textContent = pad(repIndex + 1);
+        detailCards.forEach((card, index) => card.setAttribute('data-status', index === repIndex ? 'active' : 'inactive'));
+    }
+
+    function goTo(targetIndex) {
+        const target = ((targetIndex % total) + total) % total;
+        if (isAnimating || target === activeIndex) return;
+        isAnimating = true;
+
+        const previousIndex = activeIndex;
+        const direction = getOffset(target, previousIndex) > 0 ? 1 : -1;
+
+        slides.forEach((slide, index) => {
+            const currentOffset = getOffset(index, previousIndex);
+            const nextOffset = getOffset(index, target);
+
+            // Slides coming into view start from the parked slot on the side they enter from.
+            if ((currentOffset < -3 || currentOffset > 3) && nextOffset >= -2 && nextOffset <= 2) {
+                gsap.set(slide, getSlideProps(direction > 0 ? 3 : -3));
+            }
+            // A parked slide switching sides jumps there instead of sliding across the row.
+            if (Math.abs(currentOffset) >= 3 && Math.abs(nextOffset) === 3 && currentOffset * nextOffset < 0) {
+                gsap.set(slide, getSlideProps(nextOffset > 0 ? 3 : -3));
+            }
+        });
+
+        activeIndex = target;
+        showActiveDetails();
+        layout(true, previousIndex);
+        gsap.delayedCall(duration + 0.05, () => {
+            isAnimating = false;
+        });
+    }
+
+    prev.addEventListener('click', () => goTo(activeIndex - 1));
+    next.addEventListener('click', () => goTo(activeIndex + 1));
+
+    // A swipe that ends over a neighbouring photo also fires that photo's click; ignore it.
+    let swipedAt = 0;
+    slides.forEach((slide, index) => {
+        slide.addEventListener('click', () => {
+            if (Date.now() - swipedAt < 400) return;
+            if (index !== activeIndex) goTo(index);
+        });
+    });
+
+    // Touch swipe. The list is touch-action: pan-y, so vertical page scrolling still works
+    // (the browser cancels the pointer when it takes over a vertical pan).
+    let startX = null;
+    let startY = null;
+    viewport.addEventListener('pointerdown', event => {
+        if (event.pointerType === 'mouse') return;
+        startX = event.clientX;
+        startY = event.clientY;
+    });
+    viewport.addEventListener('pointerup', event => {
+        if (startX === null) return;
+        const dx = event.clientX - startX;
+        const dy = event.clientY - startY;
+        startX = null;
+        if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
+        swipedAt = Date.now();
+        goTo(activeIndex + (dx < 0 ? 1 : -1));
+    });
+    viewport.addEventListener('pointercancel', () => {
+        startX = null;
+    });
+
+    // Arrow keys, only while the slider is actually on screen.
+    let inView = false;
+    new IntersectionObserver(entries => {
+        inView = entries[0].isIntersecting;
+    }, { threshold: 0.35 }).observe(stage);
+    document.addEventListener('keydown', event => {
+        if (!inView || event.defaultPrevented) return;
+        const active = document.activeElement;
+        if (active && /^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName)) return;
+        if (event.key === 'ArrowLeft') goTo(activeIndex - 1);
+        if (event.key === 'ArrowRight') goTo(activeIndex + 1);
+    });
+
+    // Parked and clipped slides sit outside the viewport, where lazy images would only start
+    // loading mid-transition; load them all once the slider is close.
+    new IntersectionObserver((entries, observer) => {
+        if (!entries.some(entry => entry.isIntersecting)) return;
+        stage.querySelectorAll('img[loading="lazy"]').forEach(img => {
+            img.loading = 'eager';
+        });
+        observer.disconnect();
+    }, { rootMargin: '600px 0px' }).observe(stage);
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            measure();
+            layout(false);
+        }, 100);
+    });
+
+    measure();
+    layout(false);
+    showActiveDetails();
+}
+
+// Initialize Representatives Slider
+document.addEventListener('DOMContentLoaded', () => {
+    initRepSliders();
+});
