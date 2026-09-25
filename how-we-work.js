@@ -79,12 +79,39 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 });
 
+                // Resting points, so the scroll never settles mid-crossfade with two items'
+                // words overlapping each other. The timeline runs (count - 1) + transitionDuration
+                // units long: item i owns slot [i, i+1], each boundary spending transitionDuration
+                // on the outgoing exit and the incoming entrance. That leaves a "settled" window
+                // per item where nothing is animating, and we snap to the middle of it:
+                //   item 0      → [0, 1 - d]
+                //   item i      → [i + d, i + 1 - d]
+                //   last item   → its entrance finishes exactly at the end, so its point is 1.
+                // Snapping is directional (GSAP's default), so it only ever nudges the way the
+                // user is already scrolling and never traps them in the section.
+                const totalUnits = (itemGroups.length - 1) + transitionDuration;
+                const snapPoints = itemGroups.length > 1 && totalUnits > 0
+                    ? itemGroups.map((_, index) => {
+                        if (index === 0) return ((1 - transitionDuration) / 2) / totalUnits;
+                        if (index === itemGroups.length - 1) return 1;
+                        return (index + 0.5) / totalUnits;
+                    })
+                    : null;
+
                 const tl = gsap.timeline({
                     scrollTrigger: {
                         trigger: section,
                         start: 'top top',
                         end: 'bottom bottom',
                         scrub: true,
+                        ...(snapPoints && {
+                            snap: {
+                                snapTo: snapPoints,
+                                duration: { min: 0.15, max: 0.4 },
+                                delay: 0.05,
+                                ease: 'power1.inOut',
+                            },
+                        }),
                     },
                 });
 
