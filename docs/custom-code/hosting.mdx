@@ -19,7 +19,7 @@ There's no upload step or account — once a tag is pushed to GitHub, jsDelivr c
 
 ## Where each file needs to go in Webflow
 
-This is the current wiring. Every project-file URL uses the same tag (currently `v1.0.0`).
+This is the current wiring. Each page points at its own tag: `global.js` and `home.js` are on `v1.0.0`, `how-we-work.js` is on `v1.2.0` (European Hubs and New York). A tag holds every file, so pages can move to a newer tag independently.
 
 <Note>
   `about.js` is intentionally excluded below. The current About Us page doesn't use its markup, so this file is deprecated and should not be wired in — see [Custom Code Overview](/custom-code/overview).
@@ -57,13 +57,13 @@ This is the current wiring. Every project-file URL uses the same tag (currently 
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.15/dist/Draggable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.15/dist/InertiaPlugin.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.15/dist/CustomEase.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/Biglow-Studio/event-people-website@v1.0.0/how-we-work.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/Biglow-Studio/event-people-website@v1.2.0/how-we-work.js"></script>
     ```
 
     `how-we-work.js` registers Draggable, InertiaPlugin, and CustomEase as soon as it loads, so keep those three tags even though the member-card slider that uses them is inert.
   </Step>
-  <Step title="About Us and Contact → no page-level code">
-    `global.js` reaches them through the site footer code.
+  <Step title="About Us and Contact → no project files">
+    `global.js` reaches them through the site footer code. About Us has page-level CSS only, and Contact has a short inline script that shows the "If other" field — see [Custom Code Overview](/custom-code/overview#page-level-css).
   </Step>
 </Steps>
 
@@ -91,17 +91,17 @@ This is the current wiring. Every project-file URL uses the same tag (currently 
     This alone doesn't change the live site.
   </Step>
   <Step title="Create and push a new tag">
-    Bump from the latest tag (`git tag` lists them), e.g. `v1.0.0` → `v1.0.1`:
+    Bump from the latest tag (`git tag` lists them), e.g. `v1.2.0` → `v1.2.1`:
 
     ```bash
-    git tag -a v1.0.1 -m "Describe the release"
-    git push origin v1.0.1
+    git tag -a v1.2.1 -m "Describe the release"
+    git push origin v1.2.1
     ```
 
     Never move or re-push an existing tag — jsDelivr may keep serving the files it already cached for it. Always create a new one.
   </Step>
   <Step title="Update the script URLs in Webflow">
-    Replace the tag (currently `@v1.0.0`) with the new one in all four places: **Site settings → Custom code → Footer code** (`global.js`), and the page-level code on **Home** (`home.js`), **European Hubs**, and **New York** (`how-we-work.js`). Only the `event-people-website@…` URLs change — leave the GSAP and Lenis URLs as they are.
+    Replace the tag on the URL of each file you changed: **Site settings → Custom code → Footer code** (`global.js`), the page-level code on **Home** (`home.js`), and on **European Hubs** and **New York** (`how-we-work.js`, both pages). Only the `event-people-website@…` URLs change — leave the GSAP and Lenis URLs as they are.
   </Step>
   <Step title="Republish the site">
     Custom code changes only go live once the site is published.

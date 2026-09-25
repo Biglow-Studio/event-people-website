@@ -10,9 +10,9 @@ Static pages are regular pages where the content is edited directly on the page 
 In nav order (Home / European Hubs / New York / About Us / Contact Us):
 
 - **Home**
-- **European Hubs** (`/european-hubs`) — hero video, the "how we work" sticky-video scroll reveal, the role circles, and a country list (Italy, France, Germany, Austria, Spain, Greece and every major European hub). The **Event People representatives** grid below them comes from the [Collective members](/content-editing/cms-collections#collective-members-collection) CMS collection.
-- **New York** (`/new-york`) — a near-copy of European Hubs with a blurred video. Its representatives grid shows the New York members from the same [Collective members](/content-editing/cms-collections#which-page-a-member-appears-on) collection.
-- **About Us** (`/about`) — blurred background video hero ("What it means to be Event People"); rows on what Event People is and why it's easy to work with; Fulvia Pieroni's photo with three blocks (her story, her expertise, the business she built); then the NYC/Europe "best of both worlds" block.
+- **European Hubs** (`/european-hubs`), top to bottom: hero video; the "how we work" sticky-video scroll reveal (over the n8n Fest Berlin footage, credited bottom-right); the role circles; one full-screen photo card per country (Italy, France, Germany, Austria, Spain, Greece) plus a closing "And every major European hub." video card — see [the country cards](#european-hubs-the-country-cards); the pink ["Wherever the place, we know the people." banner](#pink-banners); the **Event People representatives** slider, which comes from the [Collective members](/content-editing/cms-collections#collective-members-collection) CMS collection — see [the representatives slider](#european-hubs-the-representatives-slider); then the two "guardian angels" paragraphs.
+- **New York** (`/new-york`) — hero video, the same sticky-video scroll reveal, the role circles, the pink ["Based in New York." banner](#pink-banners), and a representatives grid showing the New York members from the same [Collective members](/content-editing/cms-collections#which-page-a-member-appears-on) collection.
+- **About Us** (`/about`) — hero, then the "curated collective" introduction in big block text, then three alternating image/text rows (image left, then right, then left). The older timeline section is hidden, not deleted.
 - **Contact Us** (`/contact-us`)
 
 Not in the nav:
@@ -72,6 +72,54 @@ per case study, each holding an image (`.cascading-slider__img`) and a caption
   slider out) doesn't run on the canvas. That's expected — check the slider on the staging site, not
   in the Designer.
 </Warning>
+
+## European Hubs: the country cards
+
+Each country is one `minimal-card-item` in the section marked `data-countries`: a photo (an image
+with the `u-img-cover` class), a dark overlay (`u-img-cover u-dim u-extra-dim`) and the country name
+as a heading. The cards are `position: sticky`, so each one slides up over the last as you scroll,
+the same way the Home service videos do. The last card, "And every major European hub.", has a
+background video instead of a photo.
+
+<Steps>
+  <Step title="Change a country name">
+    Select the heading on the card and set **Settings → Text**.
+  </Step>
+  <Step title="Change a photo">
+    The overlay sits on top of the photo, so select the photo in the **Navigator** (the second child
+    of the card), then **Settings → Replace image**. Landscape images work best.
+  </Step>
+  <Step title="Add a country">
+    Select a card in the Navigator, press ⌘D / Ctrl+D, then change its name and photo. Keep the
+    order photo → overlay inside the card, or the overlay ends up under the photo.
+  </Step>
+</Steps>
+
+<Note>
+  The larger country type and the France photo's crop come from the page's custom code, so in the
+  Designer the names look smaller than on the live site. France currently uses the Haier
+  hospitality photo from Paris as a stand-in until a France image is chosen.
+</Note>
+
+## Pink banners
+
+"Wherever the place, we know the people." (European Hubs) and "Based in New York. / Ready for your
+event in the city." (New York) are ordinary sections with two utility classes added:
+`u-bg-primary` (the Event People pink) and `u-text-white`. The extra height and the larger type
+come from each page's custom code, which targets `.section.u-bg-primary.u-text-white`. To make
+another banner, duplicate one of these sections and change the text.
+
+## European Hubs: the representatives slider
+
+The representatives list on European Hubs is still the Collective members collection list. It
+carries the `data-rep-slider` attribute, and on the live site `how-we-work.js` reads its cards and
+rebuilds them as the Home-style cascading slider, with the active person's role, name, country
+and bio in a panel underneath. There's no autoplay, so a bio never changes under a reader.
+
+- The Designer still shows the plain card grid — that's expected. Check the slider on staging.
+- The order comes from the list's **Sort** setting (currently Name, A → Z), and who appears comes
+  from its filters — see [CMS Collections](/content-editing/cms-collections#which-page-a-member-appears-on).
+- New York's list has no `data-rep-slider` attribute, so it stays a grid.
 
 ## Before you publish, double-check
 

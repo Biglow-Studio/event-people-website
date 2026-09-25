@@ -6,7 +6,7 @@ description: What the four project JS files do, their dependencies, and current 
 Custom code here is JavaScript layered on top of Webflow's standard build — almost entirely GSAP-driven scroll and interaction animation (sliders, pinned sections, split-text reveals, etc.), plus one smooth-scroll library.
 
 <Note>
-  **Current state:** the three live files are wired into Webflow and served from jsDelivr, pinned to the repo's `v1.0.0` tag — `global.js` site-wide via the site footer code, `home.js` on Home, and `how-we-work.js` on European Hubs and New York. About Us and Contact have no page-level code. Pushing to `main` alone doesn't change the live site — see [Hosting the Custom Code](/custom-code/hosting) for the exact snippets and how to ship a change.
+  **Current state:** the three live files are wired into Webflow and served from jsDelivr, each pinned to a repo tag — `global.js` site-wide via the site footer code (`v1.0.0`), `home.js` on Home (`v1.0.0`), and `how-we-work.js` on European Hubs and New York (`v1.2.0`). Contact has a small page-level script for the "If other" form field, and European Hubs, New York and About carry page-level CSS (see [Page-level CSS](#page-level-css)). Pushing to `main` alone doesn't change the live site — see [Hosting the Custom Code](/custom-code/hosting) for the exact snippets and how to ship a change.
 </Note>
 
 ## The four project files
@@ -20,11 +20,23 @@ Custom code here is JavaScript layered on top of Webflow's standard build — al
 | [`global.js`](https://github.com/Biglow-Studio/event-people-website/blob/main/global.js) | **Site-wide** | Nav menu open/close animation and content stagger; hides the nav bar once the footer scrolls into view. Loaded from the site footer code, so it runs on every page. |
 | [`home.js`](https://github.com/Biglow-Studio/event-people-website/blob/main/home.js) | **Home** page only | Cascading image slider, sticky steps indicator, hero video object-position handling. |
 | [`about.js`](https://github.com/Biglow-Studio/event-people-website/blob/main/about.js) | **Deprecated — not in use** | Built for an earlier About page layout: a pinned visuals column against a step timeline, plus an interactive image collage. The current About Us page doesn't use any of that markup, so this file will not be wired in. Kept in the repo for reference only — see [Hosting the Custom Code](/custom-code/hosting). |
-| [`how-we-work.js`](https://github.com/Biglow-Studio/event-people-website/blob/main/how-we-work.js) | **European Hubs** + **New York** pages | Drives the "how we work" sticky-video scroll reveal on **both** European Hubs and New York. Items hidden in Webflow (`display: none`) are skipped — a hidden item used to leave dead scroll at the end of the pinned section. The file still contains the spatial member-card slider (`initSpatialCardsSlider`) and bio "read more" toggle (`initCollectiveCardBios`), but both are now inert: the representatives section was redesigned in Webflow as a static grid, with no `data-spatial-slider-init` attribute or `.read-more-button` in the markup, so both return early. A third feature that used to live here — a radial cards slider — was removed from the live site; only orphaned CSS referencing it remains, and the corresponding JS has been cleaned out of this file. |
+| [`how-we-work.js`](https://github.com/Biglow-Studio/event-people-website/blob/main/how-we-work.js) | **European Hubs** + **New York** pages | Drives the "how we work" sticky-video scroll reveal on **both** European Hubs and New York. Items hidden in Webflow (`display: none`) are skipped — a hidden item used to leave dead scroll at the end of the pinned section — and the scroll snaps to each line's resting point (`v1.1.0`), so it never stops halfway through a crossfade with two lines overlapping. Since `v1.2.0` it also builds the **European Hubs representatives slider** (`initRepSliders`): any `.collective-gsap-slider` with a `data-rep-slider` attribute is rebuilt from its CMS cards as the Home-style cascading slider (same `.cascading-slider*` classes and slot maths as `home.js`, no autoplay, swipe and arrow keys) with a bio panel below. The file still contains the spatial member-card slider (`initSpatialCardsSlider`) and bio "read more" toggle (`initCollectiveCardBios`), but both are inert: there's no `data-spatial-slider-init` attribute or `.read-more-button` in the markup, so both return early. A third feature that used to live here — a radial cards slider — was removed from the live site; only orphaned CSS referencing it remains, and the corresponding JS has been cleaned out of this file. |
 
 <Warning>
   **Do not delete or edit custom code unless you are explicitly instructed to.** These files are tightly coupled to specific class names and data attributes in the Webflow structure — small changes on either side (Webflow structure or the JS) can silently break animations.
 </Warning>
+
+## Page-level CSS
+
+Some layout lives in each page's **Page settings → Custom code → Inside `<head>`** rather than in
+Webflow classes. Page custom code doesn't render in the Designer canvas, so these sections look
+plainer in the Designer than on the live site.
+
+| Page | What the page CSS does |
+|---|---|
+| European Hubs | Pink-banner height and type size (`.section.u-bg-primary.u-text-white`); country-card type size, and the crop of the France photo (`[data-countries]`); all of the representatives slider's styling (`.rep-slider*`, and hides the original grid once the slider is built); spacing under the sticky-video intro and above the "guardian angels" paragraphs; the n8n video credit (`.video-credit`). The older radial/spatial slider CSS above it is orphaned. |
+| New York | Pink-banner height and type size; spacing under the sticky-video intro. Same orphaned slider CSS as European Hubs. |
+| About Us | The three rows under the intro as alternating image/text (`[data-about-split]`), and the space under the intro paragraph. The timeline marker CSS above it is left over from the hidden timeline section. |
 
 ## Dependencies (load order matters)
 
