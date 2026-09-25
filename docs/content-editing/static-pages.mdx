@@ -97,8 +97,9 @@ background video instead of a photo.
 
 <Note>
   The larger country type and the France photo's crop come from the page's custom code, so in the
-  Designer the names look smaller than on the live site. France currently uses the Haier
-  hospitality photo from Paris as a stand-in until a France image is chosen.
+  Designer the names look smaller than on the live site. France uses the Haier hospitality photo
+  from Paris. Don't use `milan-hero.jpg` anywhere: it's an Unsplash+ preview with watermarks
+  across it (Italy uses `milan-gallery-2.jpg` instead).
 </Note>
 
 ## Pink banners
@@ -117,8 +118,8 @@ rebuilds them as the Home-style cascading slider, with the active person's role,
 and bio in a panel underneath. There's no autoplay, so a bio never changes under a reader.
 
 - The Designer still shows the plain card grid — that's expected. Check the slider on staging.
-- The order comes from the list's **Sort** setting (currently Name, A → Z), and who appears comes
-  from its filters — see [CMS Collections](/content-editing/cms-collections#which-page-a-member-appears-on).
+- The order comes from each member's **Order** number in the CMS (the list sorts by Order, then
+  Name), and who appears comes from its filters — see [CMS Collections](/content-editing/cms-collections#which-page-a-member-appears-on).
 - New York's list has no `data-rep-slider` attribute, so it stays a grid.
 
 ## Before you publish, double-check

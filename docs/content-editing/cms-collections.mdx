@@ -22,6 +22,7 @@ Slug: `collaborators` · used on the **European Hubs** and **New York** pages (t
 | Country | Plain text | Decides which page the member appears on — see below. |
 | Bio | Plain text | Max 300 characters (raised from 250 in September 2026 to fit Shawn Rolph’s bio) — a card-length field, not a full profile. Shown in full on the representatives grid; European Hubs only lists members that have one. |
 | Photo | Image | |
+| Order | Number | Position on the representatives list: 1 shows first. Both pages sort by **Order**, then by **Name** A → Z, so people with the same number (or none) fall back to alphabetical. |
 
 ### Which page a member appears on
 
@@ -29,8 +30,10 @@ Each page's representatives list is a collection list with filters and a sort or
 
 | Page | Filters | Sort |
 |---|---|---|
-| European Hubs | `Country ≠ New York` **and** `Bio is set` **and** `Country ≠ Brooklyn` | Name, A → Z |
-| New York | `Country = New York` **or** `Country = Brooklyn` | Name, A → Z |
+| European Hubs | `Country ≠ New York` **and** `Bio is set` **and** `Country ≠ Brooklyn` | Order ↑, then Name A → Z |
+| New York | `Country = New York` **or** `Country = Brooklyn` | Order ↑, then Name A → Z |
+
+To change the running order, edit each member's **Order** number (current order — European Hubs: Eloisa 1, Patrizia 2, Gloria 3, Nicolas 4, Francesco 5; New York: Fulvia 1, Shawn 2) and publish the items.
 
 To show a representative on a page, set the member's **Country** (`New York` or `Brooklyn` for the New York page, any other country for European Hubs), make sure the **Bio** is filled in, and publish the item. **Country** is also the location line printed on the card, which is why Brooklyn has to be named in both filters. Changing the filters or the sort is Designer work.
 
