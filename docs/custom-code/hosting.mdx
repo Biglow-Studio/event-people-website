@@ -19,7 +19,7 @@ There's no upload step or account — once a tag is pushed to GitHub, jsDelivr c
 
 ## Where each file needs to go in Webflow
 
-This is the current wiring. Each page points at its own tag: `global.js` and `home.js` are on `v1.0.0`, `how-we-work.js` is on `v1.2.0` (European Hubs and New York). A tag holds every file, so pages can move to a newer tag independently.
+This is the current wiring. Each page points at its own tag: `global.js` and `home.js` are on `v1.0.0`, `how-we-work.js` is on `v1.3.0` (European Hubs and New York). A tag holds every file, so pages can move to a newer tag independently.
 
 <Note>
   `about.js` is intentionally excluded below. The current About Us page doesn't use its markup, so this file is deprecated and should not be wired in — see [Custom Code Overview](/custom-code/overview).
@@ -57,7 +57,7 @@ This is the current wiring. Each page points at its own tag: `global.js` and `ho
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.15/dist/Draggable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.15/dist/InertiaPlugin.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.15/dist/CustomEase.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/Biglow-Studio/event-people-website@v1.2.0/how-we-work.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/Biglow-Studio/event-people-website@v1.3.0/how-we-work.js"></script>
     ```
 
     `how-we-work.js` registers Draggable, InertiaPlugin, and CustomEase as soon as it loads, so keep those three tags even though the member-card slider that uses them is inert.
@@ -73,7 +73,7 @@ This is the current wiring. Each page points at its own tag: `global.js` and `ho
 
 ### Where custom code may be located, generally
 
-- Site settings → Custom code (site-wide header/footer snippets).
+- Site settings → Custom code (site-wide header/footer snippets). The head code currently holds only the temporary design-preview loader — see [Custom Code Overview](/custom-code/overview#design-polish-preview-temporary).
 - Page settings → Custom code (page-specific snippets).
 - Embedded code blocks on a page.
 - External files — currently this repo's JS files, served by jsDelivr.
@@ -91,11 +91,11 @@ This is the current wiring. Each page points at its own tag: `global.js` and `ho
     This alone doesn't change the live site.
   </Step>
   <Step title="Create and push a new tag">
-    Bump from the latest tag (`git tag` lists them), e.g. `v1.2.0` → `v1.2.1`:
+    Bump from the latest tag (`git tag` lists them), e.g. `v1.3.0` → `v1.3.1`:
 
     ```bash
-    git tag -a v1.2.1 -m "Describe the release"
-    git push origin v1.2.1
+    git tag -a v1.3.1 -m "Describe the release"
+    git push origin v1.3.1
     ```
 
     Never move or re-push an existing tag — jsDelivr may keep serving the files it already cached for it. Always create a new one.
