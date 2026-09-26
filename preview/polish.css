@@ -1,0 +1,89 @@
+/* Event People — design polish PREVIEW (September 2026).
+   Loaded only when someone opts in with ?preview=polish (see the loader in Site settings →
+   Custom code → Head code). Every rule is scoped to html[data-ep-preview="polish"], so none of
+   this can reach the normal site. If approved, these become the equivalent Webflow class and
+   variable edits and this file is retired.
+   Deliberately left alone: font sizes, line heights and letter-spacing (at every breakpoint),
+   the justified Home paragraph, and the hero video overlays. */
+
+html[data-ep-preview="polish"] {
+  /* 1 · One side margin for everything, viewport-based. 12px on phones (as now), 24px at ~1500px
+        wide (where the nav logo already sits), easing up a little on very wide screens. */
+  --_components---container--gutter: clamp(0.75rem, 1.6vw, 2.25rem);
+  /* No fixed max width: content runs full width, minus the side margin. */
+  --_components---container--max-width: 100%;
+
+  /* 2 · Spacing scale */
+  --ep-title-gap: clamp(2.5rem, 4vw, 4rem);                /* section title → its content */
+  --ep-block-gap: var(--_components---section--padding);    /* statement → media, block → block */
+
+  /* 4 · One corner radius for controls (buttons already use 0.25rem) */
+  --_components---input--border-radius: 0.25rem;
+}
+
+/* ── 1 · Alignment ─────────────────────────────────────────────────────────────── */
+
+/* Containers that were capped at 1440px run full width like the rest. */
+html[data-ep-preview="polish"] .container.u-max-w-90 {
+  max-width: min(100% - var(--_components---container--gutter) * 2, var(--_components---container--max-width));
+}
+
+/* The nav sat on the container margin PLUS its own padding (logo at twice the page margin);
+   it now sits on the same line as the page content. */
+html[data-ep-preview="polish"] .container.nav-bar {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Footer text on the page margin (it was indented a further 24px), wordmark on the same
+   margin, and the © / Privacy bar off the screen edge. */
+html[data-ep-preview="polish"] .footer-cell-wrapper { padding-left: 0; }
+html[data-ep-preview="polish"] .footer-bottom { margin-left: 0; margin-right: 0; }
+html[data-ep-preview="polish"] .footer-legal {
+  max-width: none;
+  padding: 0.75rem var(--_components---container--gutter);
+}
+
+/* Contact: the framed photo block lines up with the page margin. */
+html[data-ep-preview="polish"] .section.contact-us {
+  margin-left: var(--_components---container--gutter);
+  margin-right: var(--_components---container--gutter);
+}
+
+/* ── 2 · Vertical rhythm ───────────────────────────────────────────────────────── */
+
+/* Section titles start at the section padding (no extra spacer above them)… */
+html[data-ep-preview="polish"] .u-mt-lg:has(> .h2-display) { margin-top: 0; }
+html[data-ep-preview="polish"] .u-mt-lg > .h2-display { margin-bottom: 0; }
+
+/* …and sit one title-gap above what they introduce. */
+html[data-ep-preview="polish"] .circles-wrapper { margin-top: var(--ep-title-gap); }
+html[data-ep-preview="polish"] .collective-gsap-slider { margin-top: var(--ep-title-gap); }
+html[data-ep-preview="polish"] .row.u-mb-md:has(+ .row .cascading-slider) { margin-bottom: var(--ep-title-gap); }
+html[data-ep-preview="polish"] .cascading-slider { margin-top: 0; }
+html[data-ep-preview="polish"] .home-tags { margin-top: var(--ep-title-gap); }
+
+/* Intro statements sit one section-gap above the photo or video that follows. */
+html[data-ep-preview="polish"] .section.sticky-video > .container .row.u-mb-lg h2 { margin-bottom: 0; }
+html[data-ep-preview="polish"] [data-about-split] .u-mb-lg { margin-bottom: var(--ep-block-gap); }
+html[data-ep-preview="polish"] [data-about-split] .u-mb-lg h2 { margin-bottom: 0; }
+html[data-ep-preview="polish"] [data-about-split] .row { row-gap: var(--ep-block-gap); }
+
+/* Home list (Hotels, Creative agencies…): room between each line and its divider. */
+html[data-ep-preview="polish"] .table-row:not(:empty) { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+
+/* ── 4 · Repeated elements ─────────────────────────────────────────────────────── */
+
+html[data-ep-preview="polish"] .cascading-slider__button { border-radius: 0.25rem; }
+html[data-ep-preview="polish"] .cascading-slider__item { color: var(--_color---neutral--off-white); }
+
+/* Preview badge */
+.ep-preview-badge {
+  position: fixed; left: 12px; bottom: 12px; z-index: 2147483000;
+  display: flex; align-items: center; gap: 0.6rem;
+  padding: 0.45rem 0.75rem; border-radius: 999px;
+  background: rgba(22, 22, 22, 0.88); color: #fffdf6;
+  font: 500 12px/1.2 Arial, sans-serif; letter-spacing: 0.02em;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+}
+.ep-preview-badge a { color: #ff3d61; text-decoration: none; }
