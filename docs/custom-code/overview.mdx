@@ -38,29 +38,6 @@ plainer in the Designer than on the live site.
 | New York | Pink-banner height and type size; spacing under the sticky-video intro; a little padding under each representative's bio (`.collective-card .bio-text-wrapper`), because the bios use trimmed text boxes and the list's overflow-hidden container was cutting off the last line's descenders. Same orphaned slider CSS as European Hubs. |
 | About Us | The three rows under the intro as alternating image/text (`[data-about-split]`), and the space under the intro paragraph. The timeline marker CSS above it is left over from the hidden timeline section. |
 
-## Design polish preview (temporary)
-
-A proposed design-polish pass (alignment, spacing rhythm, dividers, corner radii, a few copy
-fixes, and tablet/desktop-only type tweaks) is on staging as an **opt-in preview**, so it can be
-reviewed before anything is changed for real.
-
-- **Turn it on:** add `?preview=polish` to any page URL. It stays on for that browser tab until you
-  use **Exit** in the badge (or add `?preview=off`). Nobody else sees it.
-- **Compare:** the badge at the bottom of the page has a **Before / After** switch that flips the
-  layout in place. The copy fixes stay on in both states.
-- **Where it lives:** a short loader in **Site settings → Custom code → Head code** loads
-  `preview/polish.css` and `preview/polish.js` from this repo, pinned to a `preview-N` tag
-  (currently `preview-3`). Every rule in `polish.css` is scoped to
-  `html[data-ep-preview="polish"]`, so it can't affect normal visits.
-- **Phones are untouched typographically:** below 768px no font size, line height or
-  letter-spacing changes (checked element by element against the current site).
-
-<Warning>
-  This is temporary. If the polish is approved, rebuild it as Webflow class and variable edits
-  and delete the loader from the site head code; if it's rejected, just delete the loader.
-  Either way, remove it before the next publish to the production domain.
-</Warning>
-
 ## Dependencies (load order matters)
 
 These files depend on **GSAP** and several of its plugins, loaded *before* the project files:
