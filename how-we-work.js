@@ -3,8 +3,8 @@ gsap.registerPlugin(SplitText, ScrollTrigger);
 document.addEventListener('DOMContentLoaded', () => {
 
     // ─── Sticky-video service items: scroll-scrubbed SplitText crossfade ────────────────────
-    // Only one .video-featured-item is ever meant to be on screen, centered in the pinned card,
-    // with the next one's SplitText entrance overlapping the current one's exit. Items are
+    // Only one .video-featured-item is ever meant to be on screen, centered in the pinned card:
+    // the current one's SplitText exit finishes before the next one's entrance begins. Items are
     // stacked absolutely on top of each other (wrapper height pinned to the tallest item, since
     // absolute children can't otherwise size their parent) and cross-animated on a single
     // scroll-scrubbed timeline built off .section.sticky-video's scroll range.
@@ -32,8 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const heading = item.querySelector('h1');
             const description = item.querySelector('h3');
             const specs = [];
-            if (heading) specs.push({ el: heading, type: 'words', stagger: 0.06 });
-            if (description) specs.push({ el: description, type: 'words', stagger: 0.06 });
+            if (heading) specs.push({ el: heading, type: 'words' });
+            if (description) specs.push({ el: description, type: 'words' });
             return specs;
         });
         const splitTargetsByElement = new Map();
@@ -51,11 +51,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
         mediaQueries.add('(prefers-reduced-motion: no-preference)', () => {
             let scrollTl = null;
+            let itemCount = 0;
+            let direction = 1;
+            let settling = false;
             let pendingSplits = splitSpecByItem.reduce((sum, specs) => sum + specs.length, 0);
 
-            // Transition width, as a fraction of one item's scroll slot — how much of the
-            // outgoing/incoming items' slots is spent exiting/entering at each boundary.
-            const transitionDuration = 0.4;
+            // Scroll layout, in timeline units: the timeline is `count` units long and item i owns
+            // slot [i, i+1]. Each hand-off is centred on a slot boundary b and lasts TRANSITION
+            // units: the outgoing line exits over [b - HALF, b], the incoming one enters over
+            // [b, b + HALF]. Everything else is rest — the first line is settled from the moment
+            // the card pins, and the last line gets a full hold before the section scrolls away,
+            // so neither end of the section animates while it's arriving or leaving.
+            //
+            // Word staggers are spread *inside* each half-window (stagger.amount) rather than
+            // added per word. A per-word stagger ran a long line's exit well past the boundary
+            // and into the next line's entrance — the overlapping-words "limbo".
+            const TRANSITION = 0.5;
+            const HALF = TRANSITION / 2;
+            const WORD_SPREAD = 0.1;
 
             function rebuildTimeline() {
                 if (scrollTl) {
@@ -66,12 +79,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 stackItems();
 
-                // Each item keeps its char (heading) and word (description) targets in separate
-                // groups — not flattened together — so each group animates at its own stagger
-                // pace while both groups still share the same entrance/exit timeline position.
+                // Each item keeps its heading and description targets in separate groups — not
+                // flattened together — so each group ripples on its own while both groups still
+                // share the same entrance/exit window.
                 const itemGroups = splitSpecByItem.map(specs =>
-                    specs.map(spec => ({ targets: splitTargetsByElement.get(spec.el) || [], stagger: spec.stagger }))
+                    specs.map(spec => ({ targets: splitTargetsByElement.get(spec.el) || [] }))
                 );
+                itemCount = itemGroups.length;
 
                 itemGroups.forEach((groups, index) => {
                     groups.forEach(group => {
@@ -79,61 +93,81 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 });
 
-                // Resting points, so the scroll never settles mid-crossfade with two items'
-                // words overlapping each other. The timeline runs (count - 1) + transitionDuration
-                // units long: item i owns slot [i, i+1], each boundary spending transitionDuration
-                // on the outgoing exit and the incoming entrance. That leaves a "settled" window
-                // per item where nothing is animating, and we snap to the middle of it:
-                //   item 0      → [0, 1 - d]
-                //   item i      → [i + d, i + 1 - d]
-                //   last item   → its entrance finishes exactly at the end, so its point is 1.
-                // Snapping is directional (GSAP's default), so it only ever nudges the way the
-                // user is already scrolling and never traps them in the section.
-                const totalUnits = (itemGroups.length - 1) + transitionDuration;
-                const snapPoints = itemGroups.length > 1 && totalUnits > 0
-                    ? itemGroups.map((_, index) => {
-                        if (index === 0) return ((1 - transitionDuration) / 2) / totalUnits;
-                        if (index === itemGroups.length - 1) return 1;
-                        return (index + 0.5) / totalUnits;
-                    })
-                    : null;
-
                 const tl = gsap.timeline({
                     scrollTrigger: {
                         trigger: section,
                         start: 'top top',
                         end: 'bottom bottom',
                         scrub: true,
-                        ...(snapPoints && {
-                            snap: {
-                                snapTo: snapPoints,
-                                duration: { min: 0.15, max: 0.4 },
-                                delay: 0.05,
-                                ease: 'power1.inOut',
-                            },
-                        }),
+                        onUpdate: self => {
+                            if (self.direction) direction = self.direction;
+                        },
                     },
                 });
 
                 itemGroups.forEach((groups, index) => {
                     groups.forEach(group => {
                         if (!group.targets.length) return;
+                        const spread = group.targets.length > 1 ? WORD_SPREAD : 0;
+                        const timing = { duration: HALF - spread, stagger: { amount: spread } };
 
-                        // Exit: slides up and out, finishing exactly at the boundary with the
-                        // next item (not overlapping it).
-                        if (index < itemGroups.length - 1) {
-                            tl.to(group.targets, { yPercent: -110, opacity: 0, stagger: group.stagger, ease: 'expo.in', duration: transitionDuration }, index + 1 - transitionDuration);
+                        // Exit: slides up and out, finished by the boundary with the next item.
+                        if (index < itemCount - 1) {
+                            tl.to(group.targets, { yPercent: -110, opacity: 0, ease: 'expo.in', ...timing }, index + 1 - HALF);
                         }
 
-                        // Entrance: starts exactly where the previous item's exit above ends.
+                        // Entrance: starts at the boundary, once the previous line is fully gone.
                         if (index > 0) {
-                            tl.fromTo(group.targets, { yPercent: 110, opacity: 0 }, { yPercent: 0, opacity: 1, stagger: group.stagger, ease: 'expo.out', duration: transitionDuration }, index);
+                            tl.fromTo(group.targets, { yPercent: 110, opacity: 0 }, { yPercent: 0, opacity: 1, ease: 'expo.out', ...timing }, index);
                         }
                     });
                 });
 
+                // Pad to `count` units so the last line's hold is part of the scroll range.
+                tl.set({}, {}, itemCount);
+
                 scrollTl = tl;
                 ScrollTrigger.refresh();
+            }
+
+            // Settle: when scrolling stops part-way through a hand-off, finish it in the direction
+            // the user was scrolling. Rest zones — including both ends of the section — are never
+            // touched, so arriving at or leaving the section doesn't tug the page. Goes through the
+            // site's Lenis smooth scroll when it's there (site footer code), so the two don't fight.
+            function settle() {
+                const st = scrollTl && scrollTl.scrollTrigger;
+                if (!st || settling || itemCount < 2) return;
+
+                const position = st.progress * itemCount;
+                const boundary = Math.round(position);
+                if (boundary <= 0 || boundary >= itemCount) return;
+                if (Math.abs(position - boundary) >= HALF - 0.005) return;
+
+                const targetUnits = direction >= 0 ? boundary + HALF : boundary - HALF;
+                const targetY = st.start + (st.end - st.start) * (targetUnits / itemCount);
+                const distance = Math.abs(targetY - window.scrollY);
+                const release = () => { settling = false; };
+                settling = true;
+
+                if (typeof lenis !== 'undefined' && lenis && typeof lenis.scrollTo === 'function') {
+                    lenis.scrollTo(targetY, {
+                        duration: Math.min(0.9, Math.max(0.4, distance / 600)),
+                        easing: t => 1 - Math.pow(1 - t, 3),
+                        onComplete: release,
+                    });
+                    setTimeout(release, 1200);
+                } else {
+                    window.scrollTo({ top: targetY, behavior: 'smooth' });
+                    setTimeout(release, 900);
+                }
+            }
+
+            ScrollTrigger.addEventListener('scrollEnd', settle);
+
+            // Keep ScrollTrigger in step with Lenis's smoothed scroll position.
+            if (typeof lenis !== 'undefined' && lenis && typeof lenis.on === 'function' && !window.__epLenisSynced) {
+                lenis.on('scroll', ScrollTrigger.update);
+                window.__epLenisSynced = true;
             }
 
             splitSpecByItem.forEach(specs => {
@@ -159,6 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             return () => {
+                ScrollTrigger.removeEventListener('scrollEnd', settle);
                 if (scrollTl) {
                     scrollTl.scrollTrigger.kill();
                     scrollTl.kill();
