@@ -69,8 +69,13 @@ html[data-ep-preview="polish"] [data-about-split] .u-mb-lg { margin-bottom: var(
 html[data-ep-preview="polish"] [data-about-split] .u-mb-lg h2 { margin-bottom: 0; }
 html[data-ep-preview="polish"] [data-about-split] .row { row-gap: var(--ep-block-gap); }
 
-/* Home list (Hotels, Creative agencies…): room between each line and its divider. */
-html[data-ep-preview="polish"] .table-row:not(:empty) { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+/* Home list (Hotels, Creative agencies…): room between each line and its divider, and the
+   text on the page margin (the table cells indented it 4px). */
+html[data-ep-preview="polish"] .table-row > .table-cell {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  padding-left: 0;
+}
 
 /* ── 4 · Repeated elements ─────────────────────────────────────────────────────── */
 
