@@ -7,6 +7,8 @@
         [/"Event People"/g, '“Event People”'],                          // About hero quotes
         [/Event People representatives/g, 'Event People Representatives'], // match New York's casing
         [/A La Carte Services/g, 'À La Carte Services'],                // accent
+        [/\bContact us\b/g, 'Contact Us'],                              // nav button, to match the menu and footer
+        [/European Hub\b/g, 'European hub'],                            // Home hero; the page name "European Hubs" is untouched
     ];
 
     function fixCopy() {

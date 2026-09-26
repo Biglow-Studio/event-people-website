@@ -3,13 +3,14 @@
    Custom code → Head code). Every rule is scoped to html[data-ep-preview="polish"], so none of
    this can reach the normal site. If approved, these become the equivalent Webflow class and
    variable edits and this file is retired.
-   Deliberately left alone: font sizes, line heights and letter-spacing (at every breakpoint),
+   Deliberately left alone: type size, line height and letter-spacing on phones (under 768px),
    the justified Home paragraph, and the hero video overlays. */
 
 html[data-ep-preview="polish"] {
-  /* 1 · One side margin for everything, viewport-based. 12px on phones (as now), 24px at ~1500px
-        wide (where the nav logo already sits), easing up a little on very wide screens. */
-  --_components---container--gutter: clamp(0.75rem, 1.6vw, 2.25rem);
+  /* 1 · One side margin for everything, viewport-based. Phones keep exactly today's margin
+        (0.75em, about 11px), it reaches 24px at ~1500px wide (where the nav logo already sits),
+        and eases up a little on very wide screens. */
+  --_components---container--gutter: clamp(0.75em, 1.6vw, 2.25rem);
   /* No fixed max width: content runs full width, minus the side margin. */
   --_components---container--max-width: 100%;
 
@@ -69,18 +70,44 @@ html[data-ep-preview="polish"] [data-about-split] .u-mb-lg { margin-bottom: var(
 html[data-ep-preview="polish"] [data-about-split] .u-mb-lg h2 { margin-bottom: 0; }
 html[data-ep-preview="polish"] [data-about-split] .row { row-gap: var(--ep-block-gap); }
 
-/* Home list (Hotels, Creative agencies…): room between each line and its divider, and the
-   text on the page margin (the table cells indented it 4px). */
+/* Home list (Hotels, Creative agencies…): the words sat on their divider lines, with the
+   descenders touching them. Same space above, a little more below (it scales with the type),
+   and the text on the page margin (the table cells indented it 4px). */
 html[data-ep-preview="polish"] .table-row > .table-cell {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
+  padding-top: 0.75rem;
+  padding-bottom: calc(0.75rem + 0.12em);
   padding-left: 0;
+}
+
+/* ── 3 · Type, tablet and desktop only (phones stay exactly as they are) ──────────── */
+
+@media (min-width: 768px) {
+  /* One bio style: the New York cards match the European Hubs panel (16px / 1.55). */
+  html[data-ep-preview="polish"] .bio-text-content { font-size: 1rem; line-height: 1.55; }
+
+  /* One tracking for the big serif display lines: -0.02em, which the H1s already use
+     (section titles and banners were -0.01em, slider captions -0.03em). */
+  html[data-ep-preview="polish"] .h2-display,
+  html[data-ep-preview="polish"] .cascading-slider__h,
+  html[data-ep-preview="polish"] .h2-nav-item { letter-spacing: -0.02em; }
+
+  /* Copyright bar in one size ("© Event People" was larger than "Privacy Policy"). */
+  html[data-ep-preview="polish"] .footer-legal .text-footer-misc { font-size: 0.9em; }
 }
 
 /* ── 4 · Repeated elements ─────────────────────────────────────────────────────── */
 
+/* One corner radius for controls, and off-white captions like the rest of the white text. */
 html[data-ep-preview="polish"] .cascading-slider__button { border-radius: 0.25rem; }
 html[data-ep-preview="polish"] .cascading-slider__item { color: var(--_color---neutral--off-white); }
+
+/* Two divider colours: the brand black (#161616, already used on the New York cards) for
+   structural lines and outlines, and the mid grey for list rows and form fields. Pure black
+   (#000) is gone. */
+html[data-ep-preview="polish"] .section.footer,
+html[data-ep-preview="polish"] .footer-legal,
+html[data-ep-preview="polish"] .home-tag,
+html[data-ep-preview="polish"] .circle-item { border-color: var(--_color---neutral--black); }
 
 /* Preview badge */
 .ep-preview-badge {
