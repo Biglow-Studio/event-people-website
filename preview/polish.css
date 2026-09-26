@@ -109,13 +109,20 @@ html[data-ep-preview="polish"] .footer-legal,
 html[data-ep-preview="polish"] .home-tag,
 html[data-ep-preview="polish"] .circle-item { border-color: var(--_color---neutral--black); }
 
-/* Preview badge */
+/* Preview badge: a Before / After switch (flips the layout in place; the copy fixes stay on)
+   and a link that turns the preview off. Bottom centre, clear of the © line and Privacy link. */
 .ep-preview-badge {
-  position: fixed; left: 12px; bottom: 12px; z-index: 2147483000;
-  display: flex; align-items: center; gap: 0.6rem;
-  padding: 0.45rem 0.75rem; border-radius: 999px;
-  background: rgba(22, 22, 22, 0.88); color: #fffdf6;
+  position: fixed; left: 50%; bottom: 12px; transform: translateX(-50%); z-index: 2147483000;
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.3rem 0.35rem 0.3rem 0.85rem; border-radius: 999px;
+  background: rgba(22, 22, 22, 0.9); color: #fffdf6; white-space: nowrap;
   font: 500 12px/1.2 Arial, sans-serif; letter-spacing: 0.02em;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
-.ep-preview-badge a { color: #ff3d61; text-decoration: none; }
+.ep-preview-badge__seg { display: flex; padding: 2px; border-radius: 999px; background: rgba(255, 253, 246, 0.14); }
+.ep-preview-badge__seg button {
+  font: inherit; letter-spacing: inherit; color: #fffdf6; background: transparent;
+  border: 0; border-radius: 999px; padding: 0.3rem 0.75rem; cursor: pointer;
+}
+.ep-preview-badge__seg button[aria-pressed="true"] { background: #fffdf6; color: #161616; }
+.ep-preview-badge a { color: #ff3d61; text-decoration: none; padding: 0.3rem 0.6rem 0.3rem 0.2rem; }
