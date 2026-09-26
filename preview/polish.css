@@ -40,6 +40,11 @@ html[data-ep-preview="polish"] .container.nav-bar {
    margin, and the © / Privacy bar off the screen edge. */
 html[data-ep-preview="polish"] .footer-cell-wrapper { padding-left: 0; }
 html[data-ep-preview="polish"] .footer-bottom { margin-left: 0; margin-right: 0; }
+/* The footer box had invisible 1px side borders (the same colour as the page) that pushed
+   everything inside it 1px off the margin, and the big "Event People" wordmark image carried
+   12px of padding each side, so its letters started 12px inside the margin. */
+html[data-ep-preview="polish"] .footer-wrapper { border-left-width: 0; border-right-width: 0; }
+html[data-ep-preview="polish"] .footer-logo-full { padding-left: 0; padding-right: 0; }
 html[data-ep-preview="polish"] .footer-legal {
   max-width: none;
   padding: 0.75rem var(--_components---container--gutter);
