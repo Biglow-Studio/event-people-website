@@ -678,13 +678,15 @@ document.addEventListener('DOMContentLoaded', () => {
 // Opt-in per list: a `.collective-gsap-slider` carrying the `data-rep-slider` attribute
 // (European Hubs). The CMS list stays the source of truth, and the Designer keeps showing
 // it as the plain card grid. At runtime each card is read and rebuilt as the Home
-// case-study slider (same `.cascading-slider*` classes, same slot maths as
-// initCascadingSlider in home.js), with a panel under it showing the active person's
-// role, name, country and bio. Unlike Home there is no autoplay, so a bio never changes
-// under someone who is reading it: prev/next, clicking a neighbouring photo, swiping and
-// the arrow keys (while the slider is on screen) move it. The CSS lives in the page's
-// own custom code. Home's own slider attributes (data-cascading-*) are deliberately not
-// used, so home.js could never pick this one up as well.
+// case-study slider (same `.cascading-slider*` classes, same slot idea as
+// initCascadingSlider in home.js). Since v1.4.0 the active slide is a portrait frame
+// (4:5 on tablet and desktop, taller on phones) because the photos are portraits, and the
+// person's role, country and bio sit on the photo under their name; there is no panel,
+// counter or arrow buttons. Unlike Home there is no autoplay, so a bio never changes under
+// someone who is reading it: clicking a neighbouring photo, swiping and the arrow keys
+// (while the slider is on screen) move it. The CSS lives in the page's own custom code.
+// Home's own slider attributes (data-cascading-*) are deliberately not used, so home.js
+// could never pick this one up as well.
 function initRepSliders() {
     document.querySelectorAll('[data-rep-slider]').forEach(root => {
         if (root.hasAttribute('data-rep-slider-ready')) return;
@@ -727,24 +729,6 @@ function buildRepSlider(reps) {
         return el;
     };
 
-    // Same arrow as the Home slider buttons; the prev button mirrors it via .invert-button.
-    const arrow = () => {
-        const ns = 'http://www.w3.org/2000/svg';
-        const svg = document.createElementNS(ns, 'svg');
-        svg.setAttribute('width', '27');
-        svg.setAttribute('height', '11');
-        svg.setAttribute('viewBox', '0 0 27 11');
-        svg.setAttribute('fill', 'none');
-        svg.setAttribute('aria-hidden', 'true');
-        const path = document.createElementNS(ns, 'path');
-        path.setAttribute('d', 'M3.53522e-06 6.39362C7.61822 6.39362 18.3595 6.62812 18.9698 6.84797C19.5802 7.06783 19.8853 8.4037 19.8853 9.23927L19.8853 10.8865C21.1529 9.16765 22.7724 7.63743 26.9817 5.48136C22.7724 2.85285 21.1529 1.71889 19.8853 -3.10192e-07L19.8853 1.64726C19.8853 2.48283 19.5802 3.81871 18.9698 4.03856C18.3595 4.25842 7.61822 4.49292 3.61831e-06 4.49292L3.53522e-06 6.39362Z');
-        path.setAttribute('fill', 'currentColor');
-        svg.appendChild(path);
-        return svg;
-    };
-
-    const pad = value => String(value).padStart(2, '0');
-
     const el = make('div', 'rep-slider');
     const stage = make('div', 'cascading-slider rep-slider__stage', {
         role: 'region',
@@ -773,8 +757,12 @@ function buildRepSlider(reps) {
                 draggable: 'false',
             }));
         }
+        // Name, then role · country, then bio, all on the photo (shown for the active slide).
         const content = make('div', 'cascading-slider__item-content');
         content.appendChild(make('h3', 'cascading-slider__h', null, rep.name));
+        const meta = [rep.role, rep.country].filter(Boolean).join(' · ');
+        if (meta) content.appendChild(make('p', 'rep-slider__meta', null, meta));
+        if (rep.bio) content.appendChild(make('p', 'rep-slider__bio', null, rep.bio));
         inner.append(bg, content);
         slide.appendChild(inner);
         viewport.appendChild(slide);
@@ -784,48 +772,26 @@ function buildRepSlider(reps) {
     collection.appendChild(viewport);
     stage.appendChild(collection);
 
-    const footer = make('div', 'rep-slider__footer');
-    const nav = make('nav', 'rep-slider__nav', { 'aria-label': 'Representatives' });
-    const counter = make('div', 'rep-slider__count', { 'aria-hidden': 'true' });
-    const current = make('span', 'rep-slider__count-current', null, pad(1));
-    counter.append(current, make('span', 'rep-slider__count-sep', null, '/'), make('span', null, null, pad(reps.length)));
-    const prev = make('button', 'cascading-slider__button invert-button', { type: 'button', 'aria-label': 'Previous representative' });
-    prev.appendChild(arrow());
-    const next = make('button', 'cascading-slider__button', { type: 'button', 'aria-label': 'Next representative' });
-    next.appendChild(arrow());
-    nav.append(counter, prev, next);
+    el.appendChild(stage);
 
-    // Every bio is rendered and stacked in one grid cell, so the panel is always as tall
-    // as the longest bio and the page below never jumps when the slide changes.
-    const details = make('div', 'rep-slider__details', { 'aria-live': 'polite' });
-    const detailCards = reps.map((rep, index) => {
-        const card = make('article', 'rep-slider__detail', { 'data-status': index === 0 ? 'active' : 'inactive' });
-        if (rep.role) card.appendChild(make('p', 'rep-slider__role', null, rep.role));
-        card.appendChild(make('h3', 'rep-slider__name', null, rep.name));
-        if (rep.country) card.appendChild(make('p', 'rep-slider__country', null, rep.country));
-        if (rep.bio) card.appendChild(make('p', 'rep-slider__bio', null, rep.bio));
-        details.appendChild(card);
-        return card;
-    });
-
-    footer.append(nav, details);
-    el.append(stage, footer);
-
-    return { el, stage, viewport, slides, prev, next, current, detailCards, pad };
+    return { el, stage, viewport, slides };
 }
 
 function setupRepCascade(slider, count) {
-    const { stage, viewport, prev, next, current, detailCards, pad } = slider;
+    const { stage, viewport } = slider;
     const slides = slider.slides.slice();
     const duration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 0.65;
     const ease = 'power3.inOut';
 
-    // Slot widths as fractions of the slider width, per Webflow breakpoint — as on Home.
+    // The active slide is a portrait frame (width / height = ratio) as wide as `active` of the
+    // slider allows, and no taller than `maxHeight` of the window; the stage takes its height.
+    // Neighbours get `sibling` of the width, the outer pair whatever is left (never wider than
+    // a neighbour), and the row is centred. Phones use a taller frame so the bio fits under
+    // the face.
     const breakpoints = [
-        { maxWidth: 479, activeWidth: 0.78, siblingWidth: 0.08 },
-        { maxWidth: 767, activeWidth: 0.7, siblingWidth: 0.1 },
-        { maxWidth: 991, activeWidth: 0.6, siblingWidth: 0.1 },
-        { maxWidth: Infinity, activeWidth: 0.6, siblingWidth: 0.13 },
+        { maxWidth: 767, active: 0.84, sibling: 0.05, ratio: 0.58, maxHeight: 0.74 },
+        { maxWidth: 991, active: 0.56, sibling: 0.14, ratio: 0.8, maxHeight: 0.78 },
+        { maxWidth: Infinity, active: 0.38, sibling: 0.18, ratio: 0.8, maxHeight: 0.78 },
     ];
 
     // The layout needs at least 9 slides (five visible slots plus parked ones either side),
@@ -866,9 +832,13 @@ function setupRepCascade(slider, count) {
         const viewportWidth = viewport.offsetWidth;
         const gap = parseFloat(getComputedStyle(viewport).columnGap) || 0;
 
-        const activeWidth = viewportWidth * settings.activeWidth;
-        const siblingWidth = viewportWidth * settings.siblingWidth;
-        const farWidth = Math.max(0, (viewportWidth - activeWidth - 2 * siblingWidth - 4 * gap) / 2);
+        const activeWidth = Math.min(viewportWidth * settings.active, window.innerHeight * settings.maxHeight * settings.ratio);
+        stage.style.height = Math.round(activeWidth / settings.ratio) + 'px';
+        const siblingWidth = Math.min(viewportWidth * settings.sibling, activeWidth * 0.6);
+        const farWidth = Math.min(siblingWidth * 0.7, Math.max(0, (viewportWidth - activeWidth - 2 * siblingWidth - 4 * gap) / 2));
+        // Gaps only sit next to slots that are actually visible (the outer pair is 0 on phones).
+        const gapAfter = width => (width > 0 ? gap : 0);
+        const rowWidth = activeWidth + 2 * (siblingWidth + gapAfter(siblingWidth)) + 2 * (farWidth + gapAfter(farWidth));
         slideWidth = activeWidth;
 
         const visibleSlots = [
@@ -879,17 +849,17 @@ function setupRepCascade(slider, count) {
             { slot: 2, width: farWidth },
         ];
 
-        let x = 0;
-        visibleSlots.forEach((def, i) => {
+        let x = Math.max(0, (viewportWidth - rowWidth) / 2);
+        visibleSlots.forEach(def => {
             slotCenters[def.slot] = x + def.width / 2;
             slotWidths[def.slot] = def.width;
-            if (i < visibleSlots.length - 1) x += def.width + gap;
+            x += def.width + gapAfter(def.width);
         });
 
         slotCenters[-3] = slotCenters[-2] - farWidth - gap;
-        slotWidths[-3] = farWidth;
+        slotWidths[-3] = 0;
         slotCenters[3] = slotCenters[2] + farWidth + gap;
-        slotWidths[3] = farWidth;
+        slotWidths[3] = 0;
 
         slides.forEach(slide => {
             slide.style.width = slideWidth + 'px';
@@ -928,12 +898,6 @@ function setupRepCascade(slider, count) {
         });
     }
 
-    function showActiveDetails() {
-        const repIndex = activeIndex % count;
-        current.textContent = pad(repIndex + 1);
-        detailCards.forEach((card, index) => card.setAttribute('data-status', index === repIndex ? 'active' : 'inactive'));
-    }
-
     function goTo(targetIndex) {
         const target = ((targetIndex % total) + total) % total;
         if (isAnimating || target === activeIndex) return;
@@ -957,15 +921,11 @@ function setupRepCascade(slider, count) {
         });
 
         activeIndex = target;
-        showActiveDetails();
         layout(true, previousIndex);
         gsap.delayedCall(duration + 0.05, () => {
             isAnimating = false;
         });
     }
-
-    prev.addEventListener('click', () => goTo(activeIndex - 1));
-    next.addEventListener('click', () => goTo(activeIndex + 1));
 
     // A swipe that ends over a neighbouring photo also fires that photo's click; ignore it.
     let swipedAt = 0;
@@ -1032,7 +992,6 @@ function setupRepCascade(slider, count) {
 
     measure();
     layout(false);
-    showActiveDetails();
 }
 
 // Initialize Representatives Slider
