@@ -676,13 +676,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ─── Representatives: Home-style cascading slider ────────────────────────────
 // Opt-in per list: a `.collective-gsap-slider` carrying the `data-rep-slider` attribute
-// (European Hubs). The CMS list stays the source of truth, and the Designer keeps showing
+// (European Hubs and, since v1.5.0, New York). The CMS list stays the source of truth, and the Designer keeps showing
 // it as the plain card grid. At runtime each card is read and rebuilt as the Home
 // case-study slider (same `.cascading-slider*` classes, same slot idea as
 // initCascadingSlider in home.js). Since v1.4.0 the active slide is a portrait frame
 // (4:5 on tablet and desktop, taller on phones) because the photos are portraits, and the
 // person's role, country and bio sit on the photo under their name; there is no panel,
-// counter or arrow buttons. Unlike Home there is no autoplay, so a bio never changes under
+// counter or arrow buttons. A short list never shows the same person twice: with three or four
+// people the outer pair of slots stays empty, and with two only the next person shows beside
+// the active one (v1.5.0). Unlike Home there is no autoplay, so a bio never changes under
 // someone who is reading it: clicking a neighbouring photo, swiping and the arrow keys
 // (while the slider is on screen) move it. The CSS lives in the page's own custom code.
 // Home's own slider attributes (data-cascading-*) are deliberately not used, so home.js
@@ -694,7 +696,8 @@ function initRepSliders() {
         const reps = Array.from(root.querySelectorAll('.w-dyn-item')).map(readRep).filter(rep => rep.name);
         if (reps.length < 2) return;
 
-        const slider = buildRepSlider(reps);
+        const heading = root.closest('.section') && root.closest('.section').querySelector('h2');
+        const slider = buildRepSlider(reps, heading ? heading.textContent.trim() : 'Representatives');
         root.appendChild(slider.el);
         root.setAttribute('data-rep-slider-ready', '');
         setupRepCascade(slider, reps.length);
@@ -717,7 +720,7 @@ function initRepSliders() {
     }
 }
 
-function buildRepSlider(reps) {
+function buildRepSlider(reps, label) {
     // CMS text only ever goes in through textContent.
     const make = (tag, className, attrs, text) => {
         const el = document.createElement(tag);
@@ -733,7 +736,7 @@ function buildRepSlider(reps) {
     const stage = make('div', 'cascading-slider rep-slider__stage', {
         role: 'region',
         'aria-roledescription': 'carousel',
-        'aria-label': 'Event People representatives',
+        'aria-label': label,
     });
     const collection = make('div', 'cascading-slider__collection');
     const viewport = make('div', 'cascading-slider__list');
@@ -835,15 +838,18 @@ function setupRepCascade(slider, count) {
         const activeWidth = Math.min(viewportWidth * settings.active, window.innerHeight * settings.maxHeight * settings.ratio);
         stage.style.height = Math.round(activeWidth / settings.ratio) + 'px';
         const siblingWidth = Math.min(viewportWidth * settings.sibling, activeWidth * 0.6);
-        const farWidth = Math.min(siblingWidth * 0.7, Math.max(0, (viewportWidth - activeWidth - 2 * siblingWidth - 4 * gap) / 2));
+        // With fewer than five people the outer slots would repeat someone, so they stay empty;
+        // with two, the previous and next person are the same one, so only the next shows.
+        const farWidth = count < 5 ? 0 : Math.min(siblingWidth * 0.7, Math.max(0, (viewportWidth - activeWidth - 2 * siblingWidth - 4 * gap) / 2));
+        const previousWidth = count < 3 ? 0 : siblingWidth;
         // Gaps only sit next to slots that are actually visible (the outer pair is 0 on phones).
         const gapAfter = width => (width > 0 ? gap : 0);
-        const rowWidth = activeWidth + 2 * (siblingWidth + gapAfter(siblingWidth)) + 2 * (farWidth + gapAfter(farWidth));
+        const rowWidth = activeWidth + previousWidth + gapAfter(previousWidth) + siblingWidth + gapAfter(siblingWidth) + 2 * (farWidth + gapAfter(farWidth));
         slideWidth = activeWidth;
 
         const visibleSlots = [
             { slot: -2, width: farWidth },
-            { slot: -1, width: siblingWidth },
+            { slot: -1, width: previousWidth },
             { slot: 0, width: activeWidth },
             { slot: 1, width: siblingWidth },
             { slot: 2, width: farWidth },
