@@ -12,7 +12,7 @@ In nav order (Home / European Hubs / New York / About Us / Contact Us):
 - **Home**
 - **European Hubs** (`/european-hubs`), top to bottom: hero video; the "how we work" sticky-video scroll reveal (over the n8n Fest Berlin footage, credited bottom-right); the role circles; one full-screen photo card per country (Italy, France, Germany, Austria, Spain, Greece) plus a closing "And every major European hub." video card — see [the country cards](#european-hubs-the-country-cards); the pink ["Wherever the place, we know the people." banner](#pink-banners); the **Event People representatives** slider, which comes from the [Collective members](/content-editing/cms-collections#collective-members-collection) CMS collection — see [the representatives slider](#european-hubs-the-representatives-slider); then the two "guardian angels" paragraphs.
 - **New York** (`/new-york`) — hero video, the same sticky-video scroll reveal, the role circles, the pink ["Based in New York." banner](#pink-banners), and a representatives grid showing the New York members from the same [Collective members](/content-editing/cms-collections#which-page-a-member-appears-on) collection.
-- **About Us** (`/about`) — hero, then the "curated collective" introduction in big block text, then three alternating image/text rows (image left, then right, then left). The older timeline section is hidden, not deleted.
+- **About Us** (`/about`) — hero, then the "curated collective" introduction in big block text, then three image/text rows laid out as a checkerboard: each row is half photo, half text, the photos alternate sides (left, right, left) and meet corner to corner, and the titles use the display serif. The layout comes from the page's custom code, so the Designer shows the plain three-column version. The older timeline section is hidden, not deleted.
 - **Contact Us** (`/contact-us`)
 
 Not in the nav:
@@ -106,21 +106,28 @@ background video instead of a photo.
 
 "Wherever the place, we know the people." (European Hubs) and "Based in New York. / Ready for your
 event in the city." (New York) are ordinary sections with two utility classes added:
-`u-bg-primary` (the Event People pink) and `u-text-white`. The extra height and the larger type
-come from each page's custom code, which targets `.section.u-bg-primary.u-text-white`. To make
-another banner, duplicate one of these sections and change the text.
+`u-bg-primary` (the Event People pink) and `u-text-white`. Their spacing (one section padding
+above and below the text), the inset from the screen edges (the page gutter, like the photo and
+video cards) and the larger type come from each page's custom code, which targets
+`.section.u-bg-primary.u-text-white`. To make another banner, duplicate one of these sections and
+change the text.
 
 ## European Hubs: the representatives slider
 
 The representatives list on European Hubs is still the Collective members collection list. It
 carries the `data-rep-slider` attribute, and on the live site `how-we-work.js` reads its cards and
-rebuilds them as the Home-style cascading slider, with the active person's role, name, country
-and bio in a panel underneath. There's no autoplay, so a bio never changes under a reader.
+rebuilds them as the Home-style cascading slider. The active photo is a portrait frame (4:5; taller
+on phones), and the person's name, then role · country, then bio sit on the photo. There's no
+counter, no arrow buttons and no autoplay: visitors click a neighbouring photo, swipe, or use the
+arrow keys, and a bio never changes under a reader.
 
 - The Designer still shows the plain card grid — that's expected. Check the slider on staging.
 - The order comes from each member's **Order** number in the CMS (the list sorts by Order, then
   Name), and who appears comes from its filters — see [CMS Collections](/content-editing/cms-collections#which-page-a-member-appears-on).
 - New York's list has no `data-rep-slider` attribute, so it stays a grid.
+- Upload photos at least 1200 px wide, ideally 3:4 or 4:5 portraits. The slider shows the
+  uploaded file as is, and a small one looks soft on a large or high-resolution screen (Patrizia
+  Modena's current photo is only 640×545).
 
 ## Before you publish, double-check
 
