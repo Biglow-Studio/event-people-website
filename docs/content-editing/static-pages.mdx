@@ -13,12 +13,27 @@ In nav order (Home / European Hubs / New York / About Us / Contact Us):
 - **European Hubs** (`/european-hubs`), top to bottom: hero video; the "how we work" sticky-video scroll reveal (over the n8n Fest Berlin footage, credited bottom-right); the role circles; one full-screen photo card per country (Italy, France, Germany, Austria, Spain, Greece) plus a closing "And every major European hub." video card — see [the country cards](#european-hubs-the-country-cards); the pink ["Wherever the place, we know the people." banner](#pink-banners), joined straight onto the last card; the **Event People Representatives** slider, which comes from the [Collective members](/content-editing/cms-collections#collective-members-collection) CMS collection — see [the representatives slider](#the-representatives-slider-european-hubs-and-new-york); then the two "guardian angels" paragraphs.
 - **New York** (`/new-york`) — hero video, the same sticky-video scroll reveal, the role circles, the pink ["Based in New York." banner](#pink-banners), and the same representatives slider as European Hubs, showing the New York members from the same [Collective members](/content-editing/cms-collections#which-page-a-member-appears-on) collection.
 - **About Us** (`/about`) — hero, then the "curated collective" introduction in big block text, then three image/text rows laid out as a checkerboard: each row is half photo, half text, the photos alternate sides (left, right, left) and meet corner to corner, and the titles use the display serif with the larger Paragraph XL text under them. The first row's photo is Fulvia's Berlin portrait (`fulvia-berlin.jpg`, set through the Image component's **Image** property); the page CSS nudges its crop up so her head isn't cut off. Swap in another photo the same way — it gets the normal centred crop, so pick a landscape shot or one with the subject in the middle. The layout comes from the page's custom code, so the Designer shows the plain three-column version. The older timeline section is hidden, not deleted.
-- **Contact Us** (`/contact-us`)
+- **Contact Us** (`/contact-us`) — see [Forms & Submissions](/content-editing/forms) for where submissions go.
+
+Every page ends with the footer (the **Footer-closer-full** component — edit it once and it changes
+everywhere). Its **Our Offices** block lists Berlin (Düsseldorfer Straße 68, 10719 Berlin – Germany),
+New York (150 East 52nd Street, New York, NY 10022 US) and Milan (Via Margherita Hack 4, Arcore 20862,
+Italy, updated September 29, 2026; a non-breaking space keeps "Hack 4" together). The **Privacy Policy**
+link in the bottom bar opens the page below.
 
 Not in the nav:
 
 - **Destinations** — set to **Draft** (not deleted) and replaced by New York. The [Destinations](/content-editing/cms-collections#destinations-collection) CMS collection still exists.
 - **Coming soon** — currently unpublished/draft holding page.
+- **Privacy Policy** (`/privacy-policy`) — linked from the footer. Added September 29, 2026, adapted from
+  QT Event Studio's policy for eventpeople.us: Event People, 150 East 52nd Street, New York, as the owner
+  and fulvia@eventpeople.us as the contact, with U.S. privacy rights in place of the GDPR section. It
+  lists only the services the site actually uses — Webflow (hosting and the contact form), Cloudflare
+  Turnstile (Webflow's form spam protection) and the jsDelivr and unpkg code CDNs — and says the site
+  sets no cookies or analytics. **If you add analytics, a newsletter tool, embedded videos or anything
+  else that collects data, add it to the policy** and change the date at the top and bottom. The text
+  is plain headings, paragraphs and lists inside `.legal-section` blocks, edited like any other text;
+  its reading layout is page CSS (see [Custom Code Overview](/custom-code/overview#page-level-css)).
 
 ## How to update a static page
 

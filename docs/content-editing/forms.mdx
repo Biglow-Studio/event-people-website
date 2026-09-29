@@ -12,6 +12,28 @@ Event People has one native Webflow form:
   *Renamed from its original placeholder name "Example Form" for clarity in the Forms panel.*
 </Card>
 
+## Where submissions are emailed
+
+Every submission is saved in Webflow and emailed to **fulvia@eventpeople.us**. Two settings
+control that, and the form's own setting wins over the site default:
+
+- **Site default:** Site settings → **Forms** → **Send form submissions to**. Set to
+  fulvia@eventpeople.us on September 29, 2026 (it still pointed at the original developer).
+- **The Contact Form itself:** in the Designer, select the form block → **Settings** → **Send to** →
+  **Email Notifications**. It follows the site default. Until September 29, 2026 it had its own
+  recipient (the original developer) and ignored the site setting; **Reset to defaults** in that
+  popover cleared it. If someone adds a recipient here again, only that address gets the email.
+
+<Warning>
+  The staging address sends the same emails, so a test submission on
+  event-people-reworked.webflow.io lands in Fulvia's inbox.
+</Warning>
+
+After sending, the form shows **"Thank you for your submission!"** in black on the white card (the
+`form-success_flex` class uses the **Neutral / Black** colour; it used to carry `u-text-white`, which
+made the message invisible on the white card). Preview it in the Designer with the form block's
+**State → Success**.
+
 ## "Where did you find us?"
 
 A Select Field with the choices **LinkedIn · Google · An AI engine · YouTube · Instagram · Other**,
