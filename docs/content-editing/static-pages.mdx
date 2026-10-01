@@ -21,6 +21,14 @@ New York (150 East 52nd Street, New York, NY 10022 US) and Milan (Via Margherita
 Italy, updated September 29, 2026; a non-breaking space keeps "Hack 4" together). The **Privacy Policy**
 link in the bottom bar opens the page below.
 
+On tablets and phones (991px and below) the footer is spaced by padding and gaps, not fixed heights.
+The heading cells (`.footer-cell-wrapper.is-heading`) and the big wordmark (`.footer-logo-full`) have
+a min height of 0, so they hug their content. The addresses (`.footer-address`) have no bottom margin.
+Each `.footer-grid` ends with 2.5rem of padding below 767px. On phones (479px and below) the grid has
+a single row track, so empty rows can't add gaps. That gives 40px between the Menu block, the
+offices and the wordmark, and 24px between offices. Don't put the old min heights back (8rem /
+13rem / 7.5rem). They were what left the large empty gaps on phones before October 1, 2026.
+
 Not in the nav:
 
 - **Destinations** — set to **Draft** (not deleted) and replaced by New York. The [Destinations](/content-editing/cms-collections#destinations-collection) CMS collection still exists.
@@ -88,6 +96,25 @@ per case study, each holding an image (`.cascading-slider__img`) and a caption
   in the Designer.
 </Warning>
 
+On phones the slider and its slide list (`.cascading-slider__list`) are both 80svh tall. The list was
+90svh until October 1, 2026, which pushed the slides 85px down over the first line of the tags below.
+If you change one height, change the other with it.
+
+## Buttons (the Button component)
+
+Every pink button is an instance of the **Button** component. In its properties, **Advanced →
+Wrapper Element** decides what the button is:
+
+- `div` (the default): a link. The button shows its **Link** property as a full-size link over it.
+  Use this for every button that goes somewhere, like "Contact us".
+- `button`: a form button. It has **no link at all**, whatever the Link property says. Use it only
+  for a form's submit button.
+
+Until October 1, 2026 the mobile menu's **Contact us** (inside the **Nav-new** component) was set to
+`button`, so tapping it did nothing. It's now back on the default `div`. If a button ever looks right
+but does nothing when clicked, check this setting first. The same day, the **Contact us** buttons in
+the European Hubs and New York heroes were pointed at `/contact-us`; they had been linking to `#`.
+
 ## European Hubs: the country cards
 
 Each country is one `minimal-card-item` in the section marked `data-countries`: a photo (an image
@@ -147,7 +174,8 @@ arrow keys, and a bio never changes under a reader.
 
 ## Before you publish, double-check
 
-- Links work (especially buttons and navigation).
+- Links work (especially buttons and navigation). On a phone, open the menu and tap **Contact us**.
+  It should open the Contact page.
 - Spelling and capitalization.
 - Mobile view looks acceptable — flag anything that looks "off" before publishing.
 - The interactive/animated sections listed on the [Overview](/) page look untouched.
