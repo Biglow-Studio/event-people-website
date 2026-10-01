@@ -139,9 +139,14 @@ background video instead of a photo.
 
 <Note>
   The larger country type and the France photo's crop come from the page's custom code, so in the
-  Designer the names look smaller than on the live site. France uses the Haier hospitality photo
-  from Paris. Don't use `milan-hero.jpg` anywhere: it's an Unsplash+ preview with watermarks
-  across it (Italy uses `milan-gallery-2.jpg` instead).
+  Designer the names look smaller than on the live site. France uses `paris-eiffel-seine.jpg`, the
+  Eiffel Tower over the rooftops and the Seine (since October 1, 2026). It's a portrait photo, so the
+  page CSS anchors it near the top (`[data-countries] img[src*="paris-eiffel-seine"]`,
+  `object-position: 50% 2%`) to keep the whole tower in frame on wide screens. If you swap in a
+  different France photo, change the file name in that rule too, or it falls back to a centred
+  crop. The file is 1333 px wide, so a larger original would look sharper on big monitors. Don't
+  use `milan-hero.jpg` anywhere: it's an Unsplash+ preview with watermarks across it (Italy uses
+  `milan-gallery-2.jpg` instead).
 </Note>
 
 ## Pink banners
