@@ -680,7 +680,8 @@ document.addEventListener('DOMContentLoaded', () => {
 // it as the plain card grid. At runtime each card is read and rebuilt as the Home
 // case-study slider (same `.cascading-slider*` classes, same slot idea as
 // initCascadingSlider in home.js). Since v1.4.0 the active slide is a portrait frame
-// (4:5 on tablet and desktop, taller on phones) because the photos are portraits, and the
+// (4:5 on tablet and desktop, taller on phones; since v1.6.0 a wide frame on phones held
+// sideways, where a portrait one left no room for the bio) because the photos are portraits, and the
 // person's role, country and bio sit on the photo under their name; there is no panel,
 // counter or arrow buttons. A short list never shows the same person twice: with three or four
 // people the outer pair of slots stays empty, and with two only the next person shows beside
@@ -796,6 +797,9 @@ function setupRepCascade(slider, count) {
         { maxWidth: 991, active: 0.56, sibling: 0.14, ratio: 0.8, maxHeight: 0.78 },
         { maxWidth: Infinity, active: 0.38, sibling: 0.18, ratio: 0.8, maxHeight: 0.78 },
     ];
+    // A phone held sideways has under 400px of height, which a portrait frame turns into a
+    // sliver too narrow for the name and bio. Short landscape screens get a wide frame.
+    const shortLandscape = { active: 0.62, sibling: 0.12, ratio: 1.35, maxHeight: 0.9 };
 
     // The layout needs at least 9 slides (five visible slots plus parked ones either side),
     // so a short list is padded with clones, as on Home. Slide i shows representative
@@ -819,6 +823,7 @@ function setupRepCascade(slider, count) {
     const slotWidths = {};
 
     function getSettings() {
+        if (window.innerWidth > window.innerHeight && window.innerHeight < 560) return shortLandscape;
         return breakpoints.find(breakpoint => window.innerWidth <= breakpoint.maxWidth);
     }
 
