@@ -30,12 +30,16 @@ Each page's representatives list is a collection list with filters and a sort or
 
 | Page | Filters | Sort |
 |---|---|---|
-| European Hubs | `Country ≠ New York` **and** `Bio is set` **and** `Country ≠ Brooklyn` | Order ↑, then Name A → Z |
-| New York | `Country = New York` **or** `Country = Brooklyn` | Order ↑, then Name A → Z |
+| European Hubs | `Country ≠ New York` **and** `Bio is set` **and** `Country ≠ Brooklyn` **and** `Country ≠ Manhattan` | Order ↑, then Name A → Z |
+| New York | `Country = New York` **or** `Country = Brooklyn` **or** `Country = Manhattan` | Order ↑, then Name A → Z |
 
 To change the running order, edit each member's **Order** number (current order — European Hubs: Eloisa 1, Patrizia 2, Gloria 3, Nicolas 4, Francesco 5; New York: Fulvia 1, Shawn 2) and publish the items.
 
-To show a representative on a page, set the member's **Country** (`New York` or `Brooklyn` for the New York page, any other country for European Hubs), make sure the **Bio** is filled in, and publish the item. **Country** is also the location line printed on the card, which is why Brooklyn has to be named in both filters. Changing the filters or the sort is Designer work.
+To show a representative on a page, set the member's **Country** (`New York`, `Brooklyn` or `Manhattan` for the New York page, any other value for European Hubs), make sure the **Bio** is filled in, and publish the item. **Country** is also the location line printed on the card, which is why Brooklyn and Manhattan have to be named in both filters.
+
+<Warning>
+  Typing any other place in **Country** (say "Queens" or "NYC") moves that person off New York and onto European Hubs. On October 14, 2026 Fulvia vanished from New York in the Designer because her Country was changed to "Manhattan" before Manhattan was in the filters. To use a new location, add it to both filters first: New York → `Country = …` (Match any), European Hubs → `Country ≠ …` (Match all). Changing the filters or the sort is Designer work and goes live with the next site publish.
+</Warning>
 
 Both pages show the list as a slider with the role, country and bio on the photo (see [Static Pages](/content-editing/static-pages#the-representatives-slider-european-hubs-and-new-york)).
 
